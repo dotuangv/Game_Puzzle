@@ -6,8 +6,7 @@
 #define PBL2_GAMEPUZZLE_GAME_H
 
 
-#include <SDL.h>
-#include <iostream>
+#include "CommonFunc.h"
 
 using namespace std;
 
