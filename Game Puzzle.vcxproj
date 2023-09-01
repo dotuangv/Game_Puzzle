@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CommonFunc.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gameplay.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="TextureManagercpp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonFunc.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gameplay.h" />
