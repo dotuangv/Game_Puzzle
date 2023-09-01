@@ -13,18 +13,18 @@ int main(int argc, char* argv[])
     while (game->running()) {
         frameStart = SDL_GetTicks();
 
-    //    game->handleEvents();
-    //    game->update();
-    //    game->render();
+            game->handleEvents();
+            game->update();
+            game->render();
 
-    //    frameTime = SDL_GetTicks() - frameStart;
+            frameTime = SDL_GetTicks() - frameStart;
 
-    //    if (frameDelay > frameTime) {
-    //        SDL_Delay(frameDelay - frameTime);
-    //    }
+            if (frameDelay > frameTime) {
+                SDL_Delay(frameDelay - frameTime);
+            }
 
-    //}
-    //game->clean();
+        }
+        game->clean();
     cout << "HELLO WORLD!" << endl;
 	return 0;
 }
