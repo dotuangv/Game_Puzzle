@@ -13,7 +13,11 @@
 #include <SDL_ttf.h>
 #include <queue>
 #include <vector>
-
+#include <set>
+#include <utility>
+#include "GameObject.h"
+#include <string>
+#include "Gameplay.h"
 static SDL_Window* g_Window = NULL;
 static SDL_Renderer* g_Screen = NULL;
 static SDL_Event* g_Event = NULL;
