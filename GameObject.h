@@ -1,5 +1,5 @@
 #pragma once
-#include "Game.h"
+#include "Gameplay.h"
 
 class GameObject {
 
@@ -7,7 +7,7 @@ public:
 	GameObject(const char* texturesheet, SDL_Renderer* ren, int x, int y);
 	~GameObject();
 
-	void Update();
+	void Update(int x, int y);
 	void Render();
 
 

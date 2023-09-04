@@ -9,13 +9,13 @@ GameObject::GameObject(const char* texturesheet, SDL_Renderer* ren, int x, int y
 	ypos = y;
 }
 
-void GameObject::Update()
+void GameObject::Update(int x, int y)
 {
-	//xpos++;
-	//ypos++;
+	xpos = x;
+	ypos = y;
 
-	srcRect.h = 64;
-	srcRect.w = 64;
+	srcRect.h = 128;
+	srcRect.w = 128;
 	srcRect.x = 0;
 	srcRect.y = 0;
 
