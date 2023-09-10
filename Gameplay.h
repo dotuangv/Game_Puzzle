@@ -14,9 +14,10 @@ private:
     vector<pair<vector<vector<int>>, int>> FRINGE;
     vector<vector<vector<int>>> CLOSE;
     vector<int> KQ;
+    vector<char> ANS;
     vector<int> FATHER;
     vector<pair<int, int >> p;
-
+    int Height;
     bool isRunning;
     SDL_Window* window;
     SDL_Renderer* renderer;
@@ -31,11 +32,10 @@ public:
         res = 1;
     }
     void CheckRand();
-    void Random();
+    void Random(int height);
     void display(vector<vector<int>> a);
     void Solve(pair<int, int> p);
     pair<int, int> Pos(int x, vector<vector<int>> v);
-    void Play();
     bool CheckTrung(vector<vector<int>> a);
     bool CheckGoal(vector<vector<int>> a);
     int Heuristic(vector<vector<int>> a);
@@ -51,14 +51,17 @@ public:
     int getN();
     void init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
     void handleEvents();
+    void Play();
     void update();
     void render();
     void clean();
     bool running() {
         return isRunning;
     };
+    void SolveGame();
     int getCnt() {
         return cnt;
     }
+    int checkPos(pair<int, int> p);
     static SDL_Event event;
 };

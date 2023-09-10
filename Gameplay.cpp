@@ -16,8 +16,9 @@ void Gameplay::CheckRand()
     }
 }
 
-void Gameplay::Random()
-{  
+void Gameplay::Random(int height)
+{
+    Height = height;
     while (1) {
         check = 0;
         b.resize(n * n);
@@ -28,7 +29,7 @@ void Gameplay::Random()
             for (int j = 1; j <= n; j++) {
                 int tmp = (rand() + tam++) % b.size();
                 a[i][j] = b[tmp];
-                posIMG[a[i][j]] = { 256 * (j - 1), 256 * (i - 1) };
+                posIMG[a[i][j]] = { Height/n * (j - 1), Height/n * (i - 1) };
                 if (a[i][j] == 0) zero = i;
                 b.erase(b.begin() + tmp);
             }
@@ -52,26 +53,30 @@ void Gameplay::display(vector<vector<int>> a)
 
 void Gameplay::Solve(pair<int, int> p)
 {
+    int W = a[p.first][p.second];
     int x = a[p.first - 1][p.second], y = a[p.first][p.second - 1], z = a[p.first + 1][p.second], t = a[p.first][p.second + 1];
     if (!x) {
-        a[p.first - 1][p.second] = a[p.first][p.second];
-        a[p.first][p.second] = 0;
+        //cout << "HELLO x: " << x << endl;
+        swap(a[p.first - 1][p.second], a[p.first][p.second]);
+        swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!y) {
-
-        a[p.first][p.second - 1] = a[p.first][p.second];
-        a[p.first][p.second] = 0;
+        //cout << "HELLO y: " << y << endl;
+        swap(a[p.first][p.second - 1], a[p.first][p.second]);
+        swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!z) {
-        a[p.first + 1][p.second] = a[p.first][p.second];
-        a[p.first][p.second] = 0;
+        //cout << "HELLO z: " << z << endl;
+        swap(a[p.first + 1][p.second], a[p.first][p.second]);
+        swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!t) {
-        a[p.first][p.second + 1] = a[p.first][p.second];
-        a[p.first][p.second] = 0;
+        //cout << "HELLO t: " << t << endl;
+        swap(a[p.first][p.second + 1], a[p.first][p.second]);
+        swap(posIMG[W], posIMG[0]);
         return;
     }
 }
@@ -85,31 +90,6 @@ pair<int, int> Gameplay::Pos(int x, vector<vector<int>> v)
                 return { i, j };
             }
         }
-    }
-}
-
-void Gameplay::Play()
-{
-    while (1) {
-        system("cls");
-        display(a);
-        if (cnt) {
-            cout << "You win\n";
-            break;
-        }
-        int x;
-        cin >> x;
-        while (x <= 0 || x >= n * n) {
-            system("cls");
-            display(a);
-            //			cout << "Invalid" << endl;
-            cin >> x;
-            fflush(stdin);
-        }
-        fflush(stdin);
-        //		system("cls");
-        //		display();
-        Solve(Pos(x, a));
     }
 }
 
@@ -275,11 +255,11 @@ void Gameplay::AuToRun()
         l = FATHER[l];
     }
     //cout << KQ.size() << endl;
-    for (int i = KQ.size() - 1; i >= 0; i--) {
-        cout << FRINGE[KQ[i]].second << endl;
-        display(FRINGE[KQ[i]].first);
-        cout << endl;
-    }
+    //for (int i = KQ.size() - 1; i >= 0; i--) {
+    //    cout << FRINGE[KQ[i]].second << endl;
+    //    display(FRINGE[KQ[i]].first);
+    //    cout << endl;
+    //}
 }
 
 void Gameplay::Clear()
@@ -333,6 +313,15 @@ int Gameplay::getN() {
     return n;
 }
 
+int Gameplay::checkPos(pair<int, int> p)
+{
+    for (int i = 1; i <= n * n - 1; i++)
+    {
+        if (posIMG[i] == p) return i;
+    }
+    return 0;
+}
+
 void Gameplay::setN(int n) {
     this->n = n;
 }
@@ -369,28 +358,19 @@ void Gameplay::init(const char* title, int xpos, int ypos, int width, int height
         isRunning = false;
     }
     setA();
-    Random();
+    Random(height);
     setGoal();
-    Number = new GameObject * [n * n];
-    //for (int i = 1; i <= n * n - 1; i++) {
-    //    p[i] = game->getPosImg(i);
-    //}
-    const char* s1 = "Data/Number";
-    const char* s2 = ".png";
-    for (int i = 1; i <= n * n - 1; i++) {
+    Number = new GameObject * [n * n + 1];
+    const char* s1 = "Data/YourName";
+    const char* s2 = "-";
+    const char* s3 = ".png";
+    string N = to_string(n);
+    for (int i = 0; i <= n * n - 1; i++) {
         string str = to_string(i);
-        string s = s1 + str + s2;
+        string s = s1 + N + s2 + str + s3;
         const char* filename = s.c_str();
-        Number[i] = new GameObject(filename, renderer, posIMG[i].first, posIMG[i].second);
+        Number[i] = new GameObject(filename, renderer, posIMG[i].first, posIMG[i].second, height/n, n);
     }
-    //Number[1] = new GameObject("Data/Number1.png", renderer, 0, 0);
-    //Number[2] = new GameObject("Data/Number2.png", renderer, 256, 0);
-    //Number[3] = new GameObject("Data/Number3.png", renderer, 256*2, 0);
-    //Number[4] = new GameObject("Data/Number4.png", renderer, 0, 256);
-    //Number[5] = new GameObject("Data/Number5.png", renderer, 256, 256);
-    //Number[6] = new GameObject("Data/Number6.png", renderer, 256 * 2, 256);
-    //Number[7] = new GameObject("Data/Number7.png", renderer, 0, 256 * 2);
-    //Number[8] = new GameObject("Data/Number8.png", renderer, 256, 256 * 2);
 }
 
 void Gameplay::handleEvents() {
@@ -445,14 +425,58 @@ void Gameplay::handleEvents() {
                 break;
             }
          }
+        case SDL_MOUSEBUTTONDOWN:
+        {
+            int x = event.motion.x, y = event.motion.y;
+            int H = Height / n;
+            int Px = x / H * H, Py = y / H * H;
+            int P = checkPos({ Px, Py });
+            if (P)
+            {
+                Solve(Pos(P, a));
+            }
+            break;
+        }
         default:
             break;
     }
     isRunning = !CheckGoal(a);
 }
 
+void Gameplay::SolveGame()
+{
+    AuToRun();
+    handleEvents();
+    update();
+    render();
+    SDL_Delay(1000);
+    for (int i = KQ.size() - 1; i >= 0; i--)
+    {
+        int x = FRINGE[KQ[i]].second;
+        //display(FRINGE[i].first);
+        Solve(Pos(x, a));
+        handleEvents();
+        update();
+        render();
+
+        SDL_Delay(500);
+        /*frameTime = SDL_GetTicks() - frameStart;
+
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime);
+        }*/
+    }
+    CheckGoal(a);
+    SDL_Delay(500);
+    update();
+    render();
+    SDL_Delay(10000);
+}
+
+
+
 void Gameplay::update() {
-    for (int i = 1; i <= n * n - 1; i++)
+    for (int i = 0; i <= n * n - 1; i++)
     {
         Number[i]->Update(posIMG[i].first, posIMG[i].second);
     }
@@ -464,7 +488,29 @@ void Gameplay::render() {
     {
         Number[i]->Render();
     }
+    if (!isRunning) Number[0]->Render();
     SDL_RenderPresent(renderer);
+}
+
+void Gameplay::Play()
+{
+    while (running()) {
+        //frameStart = SDL_GetTicks();
+        handleEvents();
+        update();
+        render();
+        //frameTime = SDL_GetTicks() - frameStart;
+        //if (frameDelay > frameTime) {
+        //    SDL_Delay(frameDelay - frameTime);
+        //}
+        if (!running())
+        {
+            SDL_Delay(500);
+            update();
+            render();
+            SDL_Delay(10000);
+        }
+    }
 }
 
 void Gameplay::clean() {
