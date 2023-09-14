@@ -1,4 +1,4 @@
-#include "Gameplay.h"
+﻿#include "Gameplay.h"
 #include "Game.h"
 void Gameplay::CheckRand()
 {
@@ -328,7 +328,7 @@ void Gameplay::setN(int n) {
 //Gameplay::~Game() {};
 
 GameObject** Number;
-
+GameObject** StartGame;
 SDL_Event Gameplay::event;
 SDL_Texture* PlayerTex;
 SDL_Rect srcR, destR;
@@ -357,6 +357,107 @@ void Gameplay::init(const char* title, int xpos, int ypos, int width, int height
     else {
         isRunning = false;
     }
+}
+
+void Gameplay::SetStart()
+{
+
+    StartGame = new GameObject * [5];
+    const char* s1 = "Data/Anh";
+    const char* s2 = "x";
+    const char* s3 = ".png";
+    //string N = to_string(n);
+    for (int i = 0; i <= 3; i++) {
+        string str = to_string(i + 3);
+        string s = s1 + str + s2 + str + s3;
+        const char* filename = s.c_str();
+        StartGame[i] = new GameObject(filename, renderer, PosG[i].first, PosG[i].second, 5);
+    }
+    StartGame[4] = new GameObject("Data/Background2.png", renderer, 0, 0, 5);
+}
+
+void Gameplay ::StartUpdate()
+{
+    StartGame[4]->Update(0, 0, 1050, 1400, 1000, 600);
+    for (int i = 0; i <= 3; i++)
+    {
+        StartGame[i]->Update(PosG[i].first, PosG[i].second, 150, 450, WH[i].first, WH[i].second);
+        if (WH[i].first == 210) isRunning2 = false;
+    }
+}
+
+void Gameplay::StartRenderer()
+{
+    SDL_RenderClear(renderer);
+    StartGame[4]->Render();
+    for (int i = 0; i <= 3; i++)
+    {
+        StartGame[i]->Render();
+    }
+    SDL_RenderPresent(renderer);
+}
+
+void Gameplay::StartEvents()
+{
+    SDL_PollEvent(&event);
+    switch (event.type) {
+    case SDL_QUIT:
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+    {
+        int x = event.motion.x, y = event.motion.y;
+        if (410 <= x && x <= 590)
+        {
+            if (y >= 130 && y <= 190)
+            {
+                //cout << "3x3" << endl;
+                if (!n)
+                {
+                    PosG[0] = { 395, 135 };
+                    WH[0] = { 210, 70 };
+                    n = 3;
+                }
+            }
+            else if (y >= 230 && y <= 290)
+            {
+                //cout << "4x4" << endl;
+                if (!n)
+                {
+                    PosG[1] = { 395, 235 };
+                    WH[1] = { 210, 70 };
+                    n = 4;
+                }
+            }
+            else if (y >= 330 && y <= 390)
+            {
+                //cout << "5x5" << endl;
+                if (!n)
+                {
+                    PosG[2] = { 395, 335 };
+                    WH[2] = { 210, 70 };
+                    n = 5;
+                }
+            }
+            else if (y >= 430 && y <= 490)
+            {
+                //cout << "6x6" << endl;
+                if (!n)
+                {
+                    PosG[3] = { 395, 435 };
+                    WH[3] = { 210, 70 };
+                    n = 6;
+                }
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void Gameplay::SetUpGame(int height)
+{
     setA();
     Random(height);
     setGoal();
@@ -369,7 +470,7 @@ void Gameplay::init(const char* title, int xpos, int ypos, int width, int height
         string str = to_string(i);
         string s = s1 + N + s2 + str + s3;
         const char* filename = s.c_str();
-        Number[i] = new GameObject(filename, renderer, posIMG[i].first, posIMG[i].second, height/n, n);
+        Number[i] = new GameObject(filename, renderer, posIMG[i].first, posIMG[i].second, n);
     }
 }
 
@@ -446,7 +547,7 @@ void Gameplay::handleEvents() {
 void Gameplay::SolveGame()
 {
     AuToRun();
-    handleEvents();
+    //handleEvents();
     update();
     render();
     SDL_Delay(1000);
@@ -455,18 +556,18 @@ void Gameplay::SolveGame()
         int x = FRINGE[KQ[i]].second;
         //display(FRINGE[i].first);
         Solve(Pos(x, a));
-        handleEvents();
+        //StartEvents();
         update();
         render();
 
-        SDL_Delay(500);
+        SDL_Delay(100);
         /*frameTime = SDL_GetTicks() - frameStart;
 
         if (frameDelay > frameTime) {
             SDL_Delay(frameDelay - frameTime);
         }*/
     }
-    CheckGoal(a);
+    isRunning = false;
     SDL_Delay(500);
     update();
     render();
@@ -478,7 +579,7 @@ void Gameplay::SolveGame()
 void Gameplay::update() {
     for (int i = 0; i <= n * n - 1; i++)
     {
-        Number[i]->Update(posIMG[i].first, posIMG[i].second);
+        Number[i]->Update(posIMG[i].first, posIMG[i].second, Height/n, Height/n, Height/n, Height/n);
     }
 }
 
