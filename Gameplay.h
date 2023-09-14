@@ -56,7 +56,7 @@ public:
     void setA();
     void setGoal();
     void setN(int n);
-    vector<vector<int>> getA();
+    vector<vector<int>> getA();  
     vector<vector<int>> getGoal();
     pair<int, int> getPosImg(int i);
     int getN();

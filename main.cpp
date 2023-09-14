@@ -28,9 +28,9 @@ int main(int argc, char* argv[])
         }
     }
     //game->SetUpGame(Height);
-    //game->Play();
+    game->Play();
     //game->handleEvents();
-    game->SolveGame();
+    //game->SolveGame();
     game->clean();
     game->Clear();
 	return 0;
