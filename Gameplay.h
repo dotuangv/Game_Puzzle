@@ -5,7 +5,7 @@ using namespace std;
 
 class Gameplay {
 private:
-    int n;
+    int n = 0;
     vector<vector<int>> Goal;
     vector<vector<int>> a;
     vector<int> b;
@@ -22,15 +22,26 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     int cnt, check, zero, tam, res;
+    bool isRunning2;
+    vector<pair<int, int>> PosG;
+    vector <pair<int, int>> WH;
 public:
     // Constructor
-    Gameplay(int size) : n(size), Goal(vector<vector<int>>(size + 2, vector<int>(size + 2))), a(vector<vector<int>>(size + 2, vector<int>(size + 2))), b(vector<int>(size + 2)),
-        posIMG(vector<pair<int, int>>(n*n+1)), FRINGE(100000, pair<vector<vector<int>>, int>(vector<vector<int>>(size + 2, vector<int>(size + 2)), 0)), FATHER(vector<int>(100000)) {
+    Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
+        posIMG(vector<pair<int, int>>(6*6 + 1)), FRINGE(100000, pair<vector<vector<int>>, int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)), FATHER(vector<int>(100000)),
+        PosG(vector<pair<int, int>>(5)), WH(vector<pair<int, int>>(5)) {
         cnt = 0;
         check = 0;
         tam = 0;
         res = 1;
+        for (int i = 0; i < 4; i++)
+		{
+			PosG[i] = { 410, (i + 1) * 100 + 30};
+			WH[i] = { 180, 60 };
+		}
+		isRunning2 = true;
     }
+    void SetUpGame(int Height);
     void CheckRand();
     void Random(int height);
     void display(vector<vector<int>> a);
@@ -58,10 +69,18 @@ public:
     bool running() {
         return isRunning;
     };
+    bool GetRunning2() {
+        return isRunning2;
+    };
     void SolveGame();
     int getCnt() {
         return cnt;
     }
     int checkPos(pair<int, int> p);
+    void StartEvents();
+    void SetStart();
+    void StartUpdate();
+    void StartRenderer();
+
     static SDL_Event event;
 };
