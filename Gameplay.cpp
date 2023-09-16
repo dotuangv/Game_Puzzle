@@ -357,6 +357,7 @@ GameObject** StartGame;
 SDL_Event Gameplay::event;
 SDL_Texture* PlayerTex;
 SDL_Rect srcR, destR;
+
 void Gameplay::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
     int flags = 0;
 
@@ -508,10 +509,12 @@ void Gameplay::SetUpGame(int height)
 
 void Gameplay::handleEvents() {
     // Hàm xử lí sự kiện để chơi trò chơi
+    bool isQuit = false;
     SDL_PollEvent(&event);
     switch (event.type) {
         case SDL_QUIT:
             isRunning = false;
+            isQuit = true;
             break;
         case SDL_KEYDOWN:
         {
@@ -578,7 +581,7 @@ void Gameplay::handleEvents() {
             break;
     }
     // Nếu trạng thái hiện tại là trạng thái đích thì kết thúc vòng lặp, đánh giấu trò chơi đã dừng
-    isRunning = !CheckGoal(a);
+    isRunning = !CheckGoal(a) && !isQuit;
 }
 
 void Gameplay::SolveGame()
@@ -589,8 +592,13 @@ void Gameplay::SolveGame()
     update();
     render();
     SDL_Delay(1000);
-    for (int i = KQ.size() - 1; i >= 0; i--)
+    bool isQuit = false;
+    SDL_Event e;
+    for (int i = KQ.size() - 1; i >= 0 && !isQuit; i--)
     {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) isQuit = true;
+        }
         // Tìm vị trị trong mảng KQ và cập nhật lại các ảnh của trạng thái đang xét đến
         int x = FRINGE[KQ[i]].second;
         //display(FRINGE[i].first);
@@ -607,10 +615,16 @@ void Gameplay::SolveGame()
         }*/
     }
     isRunning = false;
-    SDL_Delay(500);
-    update();
-    render();
-    SDL_Delay(10000);
+    if (!isQuit) {
+        update();
+        render();
+        while (!isQuit)
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) isQuit = true;
+        }
+        //SDL_Delay(500);
+        //SDL_Delay(10000);
+    }
 }
 
 
@@ -648,10 +662,13 @@ void Gameplay::Play()
         //}
         if (!running())
         {
-            SDL_Delay(500);
-            update();
-            render();
-            SDL_Delay(10000);
+            if (CheckGoal(a))
+            {
+                SDL_Delay(500);
+                update();
+                render();
+                SDL_Delay(10000);
+            }
         }
     }
 }
