@@ -564,6 +564,10 @@ void Gameplay::handleEvents() {
         {
             // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
             int x = event.motion.x, y = event.motion.y;
+            //if (x > 600)
+            //{
+            //    SolveGame();
+            //}
             int H = Height / n;
             // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
             int Px = x / H * H, Py = y / H * H;
