@@ -19,8 +19,6 @@ private:
     vector<pair<int, int >> p;
     int Height;
     bool isRunning;
-    SDL_Window* window;
-    SDL_Renderer* renderer;
     int cnt, check, zero, tam, res;
     bool isRunning2;
     vector<pair<int, int>> PosG;

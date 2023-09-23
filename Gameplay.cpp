@@ -367,14 +367,14 @@ void Gameplay::init(const char* title, int xpos, int ypos, int width, int height
 
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
         cout << "Subsystems Initialised!..." << endl;
-        window = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-        if (window) {
+        gWindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+        if (gWindow) {
             cout << "Window created!" << endl;
         }
 
-        renderer = SDL_CreateRenderer(window, -1, 0);
-        if (renderer) {
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        gRenderer = SDL_CreateRenderer(gWindow, -1, 0);
+        if (gRenderer) {
+            SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
             cout << "Renderer created!" << endl;
         }
 
@@ -397,9 +397,9 @@ void Gameplay::SetStart()
         string str = to_string(i + 3);
         string s = s1 + str + s2 + str + s3;
         const char* filename = s.c_str();
-        StartGame[i] = new GameObject(filename, renderer, PosG[i].first, PosG[i].second, 5);
+        StartGame[i] = new GameObject(filename, gRenderer, PosG[i].first, PosG[i].second, 5);
     }
-    StartGame[4] = new GameObject("Data/Background2.png", renderer, 0, 0, 5);
+    StartGame[4] = new GameObject("Data/Background2.png", gRenderer, 0, 0, 5);
 }
 
 void Gameplay ::StartUpdate()
@@ -416,13 +416,13 @@ void Gameplay ::StartUpdate()
 void Gameplay::StartRenderer()
 {
     // Hàm hiển thị các đối tượng giao diện game ra màn hình
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(gRenderer);
     StartGame[4]->Render();
     for (int i = 0; i <= 3; i++)
     {
         StartGame[i]->Render();
     }
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(gRenderer);
 }
 
 void Gameplay::StartEvents()
@@ -503,7 +503,7 @@ void Gameplay::SetUpGame(int height)
         string str = to_string(i);
         string s = s1 + N + s2 + str + s3;
         const char* filename = s.c_str();
-        Number[i] = new GameObject(filename, renderer, posIMG[i].first, posIMG[i].second, n);
+        Number[i] = new GameObject(filename, gRenderer, posIMG[i].first, posIMG[i].second, n);
     }
 }
 
@@ -639,13 +639,13 @@ void Gameplay::update() {
 
 void Gameplay::render() {
     // Hàm hiển thị hình ảnh các đối tượng của game ra màn hình ( các mảnh puzzle )
-    SDL_RenderClear(renderer);
+    SDL_RenderClear(gRenderer);
     for (int i = 1; i <= n * n - 1; i++)
     {
         Number[i]->Render();
     }
     if (!isRunning) Number[0]->Render();
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent(gRenderer);
 }
 
 void Gameplay::Play()
@@ -674,7 +674,7 @@ void Gameplay::Play()
 }
 
 void Gameplay::clean() {
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(gWindow);
+    SDL_DestroyRenderer(gRenderer);
     SDL_Quit();
 }
