@@ -18,16 +18,17 @@
 #include "GameObject.h"
 #include <string>
 #include "Gameplay.h"
+#include <SDL_ttf.h>
 
-extern SDL_Window* g_Window;
-extern SDL_Renderer* g_Screen;
+extern SDL_Window* gWindow;
+extern SDL_Renderer* gRenderer;
 extern SDL_Event* g_Event;
 
 
 //Screen
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 640;
+const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = 600;
 const int SCREEN_BPP = 32;
 
 const int COLOR_KEY_R = 167;

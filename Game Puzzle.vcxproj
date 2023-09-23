@@ -138,7 +138,9 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Gameplay.cpp" />
+    <ClCompile Include="LTexture.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main_Menu.cpp" />
     <ClCompile Include="Start.cpp" />
     <ClCompile Include="TextureManagercpp.cpp" />
   </ItemGroup>
@@ -147,6 +149,8 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Gameplay.h" />
+    <ClInclude Include="LTexture.h" />
+    <ClInclude Include="Main_Menu.h" />
     <ClInclude Include="Start.h" />
     <ClInclude Include="TextureManager.h" />
   </ItemGroup>
