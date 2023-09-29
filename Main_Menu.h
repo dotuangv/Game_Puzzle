@@ -1,32 +1,45 @@
-﻿    #ifndef MAINMENU_H
-    #define MAINMENU_H
+﻿ #ifndef MAINMENU_H
+#define MAINMENU_H
 
-    #include "CommonFunc.h"
-    #include "LTexture.h"
+#include "CommonFunc.h"
+#include "LTexture.h"
+#include "LButton.h"
 
-    class MainMenu {
-    public:
-        MainMenu();
-        ~MainMenu();
-        MainMenu(SDL_Renderer* renderer);
-        bool init();
-        bool loadMedia();
-        void close();
-        void run();
-        // Hiển thị menu chính
-        void showMainMenu();
+class MainMenu {
+public:
+    MainMenu();
+    ~MainMenu();
+    bool init();
+    bool loadMedia();
+    void close();
+    void run();
 
-    private:
-        LTexture MTexture;
-        TTF_Font* mFont;
-        SDL_Rect mPlayButton;
-        SDL_Rect mInstructionsButton;
-        SDL_Rect mExitButton;
-        SDL_Color mTextColor;
-        bool mQuit;
+private:
+    TTF_Font* gFont;
+    SDL_Color mTextColor;
 
-        void renderText(const std::string& text, int x, int y);
-        void handleEvents();
+    LTexture MTexture; //Background
+    LTexture Start; //Start Button
+    LTexture Help; //Help Button
+    LTexture Exit; //Exit Button
+    SDL_Rect mPlayButton;
+    SDL_Rect mInstructionsButton;
+    SDL_Rect mExitButton;
+
+    LButton gButtons[TOTAL_BUTTONS];
+
+    bool mQuit;
+
+    enum MenuButtons {
+        BUTTON_PLAY = 0,
+        BUTTON_INSTRUCTIONS = 1,
+        BUTTON_EXIT = 2,
+        TOTAL_BUTTONS
     };
+
+    SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
+
+    void renderText(const std::string& text, int x, int y);
+};
 
     #endif // MAINMENU_H
