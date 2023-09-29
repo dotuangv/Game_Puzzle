@@ -1,6 +1,5 @@
 ﻿#include "LTexture.h"
 
-
 LTexture::LTexture()
 {
 	//Initialize
@@ -32,7 +31,7 @@ bool LTexture::loadFromFile(std::string path)
 	else
 	{
 		//Color key image
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0xFF, 0xFF));
 
 		//Create texture from surface pixels
 		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
@@ -56,6 +55,42 @@ bool LTexture::loadFromFile(std::string path)
 	return mTexture != NULL;
 }
 
+#if defined(SDL_TTF_MAJOR_VERSION)
+bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
+{
+	//Get rid of preexisting texture
+	free();
+
+	//Render text surface
+	SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+	if (textSurface == NULL)
+	{
+		printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+	}
+	else
+	{
+		//Create texture from surface pixels
+		mTexture = SDL_CreateTextureFromSurface(gRenderer, textSurface);
+		if (mTexture == NULL)
+		{
+			printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+		}
+		else
+		{
+			//Get image dimensions
+			mWidth = textSurface->w;
+			mHeight = textSurface->h;
+		}
+
+		//Get rid of old surface
+		SDL_FreeSurface(textSurface);
+	}
+
+	//Return success
+	return mTexture != NULL;
+}
+#endif
+
 void LTexture::free()
 {
 	//Free texture if it exists
@@ -74,21 +109,80 @@ void LTexture::SetColor(Uint8 red, Uint8 green, Uint8 blue)
 	SDL_SetTextureColorMod(mTexture, red, green, blue);
 }
 
-void LTexture::render(int x, int y, SDL_Rect* clip)
+void LTexture::SetBlendMode(SDL_BlendMode blending)
+{
+	//Set Blending Function
+	SDL_SetTextureBlendMode(mTexture, blending);
+}
+
+void LTexture::SetAlpha(Uint8 alpha) {
+	//Modulate Texture Alpha
+	SDL_SetTextureAlphaMod(mTexture, alpha);
+}
+
+void LTexture::Resize(int newWidth, int newHeight)
+{
+	// Kiểm tra xem tấm ảnh cơ sở đã được tạo chưa
+	if (mTexture)
+	{
+		// Tạo một tấm ảnh mới với kích thước mới
+		SDL_Texture* newTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, newWidth, newHeight);
+
+		// Kiểm tra xem việc tạo tấm ảnh mới có thành công không
+		if (newTexture != NULL)
+		{
+			// Tạo một tấm ảnh tạm thời để chứa nội dung cũ
+			SDL_Texture* tempTexture = NULL;
+
+			// Đặt tấm ảnh tạm thời làm mục tiêu vẽ
+			SDL_SetRenderTarget(gRenderer, tempTexture);
+
+			// Xóa nền bằng màu trong suốt
+			SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
+			SDL_RenderClear(gRenderer);
+
+			// Đặt mTexture làm mục tiêu vẽ
+			SDL_SetRenderTarget(gRenderer, newTexture);
+
+			// Vẽ tấm ảnh cũ vào tấm ảnh tạm thời và thay đổi kích thước
+			SDL_RenderCopy(gRenderer, mTexture, NULL, NULL);
+
+			// Đặt lại mTexture làm mục tiêu vẽ
+			SDL_SetRenderTarget(gRenderer, NULL);
+
+			// Xóa tấm ảnh cũ
+			SDL_DestroyTexture(mTexture);
+
+			// Gán tấm ảnh tạm thời vào mTexture và cập nhật kích thước
+			mTexture = newTexture;
+			mWidth = newWidth;
+			mHeight = newHeight;
+		}
+		else
+		{
+			printf("Unable to create new texture! SDL Error: %s\n", SDL_GetError());
+		}
+	}
+}
+
+
+
+void LTexture::render(int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip)
 {
 	//Set rendering space and render to screen
 	SDL_Rect renderQuad = { x, y, mWidth, mHeight };
 
-	//Set clip rendering dimension
-	if (clip)
+	//Set clip rendering dimensions
+	if (clip != NULL)
 	{
 		renderQuad.w = clip->w;
 		renderQuad.h = clip->h;
 	}
 
-	//Render to the screen
-	SDL_RenderCopy(gRenderer, mTexture, NULL, &renderQuad);
+	//Render to screen
+	SDL_RenderCopyEx(gRenderer, mTexture, clip, &renderQuad, angle, center, flip);
 }
+
 
 int LTexture::getWidth()
 {
@@ -99,3 +193,71 @@ int LTexture::getHeight()
 {
 	return mHeight;
 }
+
+bool init()
+{
+	//Initialization flag
+	bool success = true;
+
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+	{
+		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+		success = false;
+	}
+	else
+	{
+		//Set texture filtering to linear
+		if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1"))
+		{
+			printf("Warning: Linear texture filtering not enabled!");
+		}
+
+		//Create window
+		gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if (gWindow == NULL)
+		{
+			printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
+			success = false;
+		}
+		else
+		{
+			//Create renderer for window
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			if (gRenderer == NULL)
+			{
+				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
+				success = false;
+			}
+			else
+			{
+				//Initialize renderer color
+				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+
+				//Initialize PNG loading
+				int imgFlags = IMG_INIT_PNG;
+				if (!(IMG_Init(imgFlags) & imgFlags))
+				{
+					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+					success = false;
+				}
+				//Initialize SDL_ttf
+				if (TTF_Init() == -1)
+				{
+					printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+					success = false;
+				}
+
+				//Initialize SDL_mixer
+				if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+				{
+					printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+					success = false;
+				}
+			}
+		}
+	}
+
+	return success;
+}
+

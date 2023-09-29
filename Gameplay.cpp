@@ -358,32 +358,32 @@ SDL_Event Gameplay::event;
 SDL_Texture* PlayerTex;
 SDL_Rect srcR, destR;
 
-void Gameplay::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
-    int flags = 0;
-
-    if (fullscreen) {
-        flags = SDL_WINDOW_FULLSCREEN;
-    }
-
-    if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-        cout << "Subsystems Initialised!..." << endl;
-        gWindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-        if (gWindow) {
-            cout << "Window created!" << endl;
-        }
-
-        gRenderer = SDL_CreateRenderer(gWindow, -1, 0);
-        if (gRenderer) {
-            SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-            cout << "Renderer created!" << endl;
-        }
-
-        isRunning = true;
-    }
-    else {
-        isRunning = false;
-    }
-}
+//void Gameplay::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
+//    int flags = 0;
+//
+//    if (fullscreen) {
+//        flags = SDL_WINDOW_FULLSCREEN;
+//    }
+//
+//    if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
+//        cout << "Subsystems Initialised!..." << endl;
+//        gWindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
+//        if (gWindow) {
+//            cout << "Window created!" << endl;
+//        }
+//
+//        gRenderer = SDL_CreateRenderer(gWindow, -1, 0);
+//        if (gRenderer) {
+//            SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+//            cout << "Renderer created!" << endl;
+//        }
+//
+//        isRunning = true;
+//    }
+//    else {
+//        isRunning = false;
+//    }
+//}
 
 void Gameplay::SetStart()
 {
