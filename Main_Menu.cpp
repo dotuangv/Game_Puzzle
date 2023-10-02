@@ -146,7 +146,8 @@ void MainMenu::run() {
                                     game->SetUpGame(SCREEN_HEIGHT);
                                 }
                             }
-                            game->SolveGame();
+                            //game->SolveGame();
+                            game->Play();
                             game->clean();
                             game->Clear();
                         delete game; // Giải phóng bộ nhớ sau khi trò chơi kết thúc
