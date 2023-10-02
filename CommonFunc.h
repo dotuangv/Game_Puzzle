@@ -45,6 +45,7 @@ const int frameDelay = 1000 / FPS;
 const int BUTTON_WIDTH = 470;
 const int BUTTON_HEIGHT = 93;
 const int TOTAL_BUTTONS = 3;
+extern int n;
 
 enum LButtonSprite
 {
@@ -54,6 +55,7 @@ enum LButtonSprite
     BUTTON_SPRITE_MOUSE_UP = 3,
     BUTTON_SPRITE_TOTAL = 3
 };
+
 
 
 #endif

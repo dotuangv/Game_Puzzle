@@ -7,18 +7,19 @@ LButton::LButton()
 	mCurrentSprite = BUTTON_SPRITE_MOUSE_OUT;
 }
 
-LButton::LButton(const LTexture& Texture)
-{
-	mPosition.x = 0;
-	mPosition.y = 0;
-	mCurrentSprite = BUTTON_SPRITE_MOUSE_OUT;
-	mTexture = Texture;
-}
 
 void LButton::SetPosition(int x, int y)
 {
 	mPosition.x = x;
 	mPosition.y = y;
+}
+
+void LButton::SetAllValue(int x, int y, int BUTTOM_WIDTH, int BUTTOM_HEIGHT) 
+{
+	mPosition.x = x;
+	mPosition.y = y;
+	ButtonWidth = BUTTOM_WIDTH;
+	ButtonHeight = BUTTON_HEIGHT;
 }
 
 void LButton::HandleEvent(SDL_Event* e)
@@ -38,7 +39,7 @@ void LButton::HandleEvent(SDL_Event* e)
 			inside = false;
 		}
 		//Mouse is right of the button
-		else if (x > mPosition.x + BUTTON_WIDTH)
+		else if (x > mPosition.x + ButtonWidth)
 		{
 			inside = false;
 		}
@@ -48,7 +49,7 @@ void LButton::HandleEvent(SDL_Event* e)
 			inside = false;
 		}
 		//Mouse below the button
-		else if (y > mPosition.y + BUTTON_HEIGHT)
+		else if (y > mPosition.y + ButtonHeight)
 		{
 			inside = false;
 		}

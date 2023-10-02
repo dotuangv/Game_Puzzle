@@ -33,7 +33,7 @@
     <ClCompile Include="CommonFunc.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Start.cpp">
+    <ClCompile Include="MenuStart.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LTexture.cpp">
@@ -43,6 +43,12 @@
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
     <ClCompile Include="LButton.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Choice.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Help.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,7 +68,7 @@
     <ClInclude Include="CommonFunc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Start.h">
+    <ClInclude Include="MenuStart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Main_Menu.h">
@@ -72,6 +78,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Choice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Help.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
