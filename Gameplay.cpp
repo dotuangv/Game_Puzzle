@@ -34,7 +34,7 @@ void Gameplay::Random(int height)
                 int tmp = (rand() + tam++) % b.size();
                 a[i][j] = b[tmp];
                 //Tính tọa độ ảnh
-                posIMG[a[i][j]] = { Height / n * (j - 1), Height / n * (i - 1) };
+                posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 87 };
                 //Tìm hàng chứa ô trống
                 if (a[i][j] == 0) zero = i;
                 b.erase(b.begin() + tmp);
@@ -45,18 +45,18 @@ void Gameplay::Random(int height)
     }
 }
 
-void Gameplay::display(vector<vector<int>> a)
-{
-    //Hàm in ra màn hình
-    cnt = 1;
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            printf("%3d ", a[i][j]);
-            if (a[i][j] != Goal[i][j]) cnt = 0;
-        }
-        cout << endl;
-    }
-}
+//void Gameplay::display(vector<vector<int>> a)
+//{
+//    //Hàm in ra màn hình
+//    cnt = 1;
+//    for (int i = 1; i <= n; i++) {
+//        for (int j = 1; j <= n; j++) {
+//            printf("%3d ", a[i][j]);
+//            if (a[i][j] != Goal[i][j]) cnt = 0;
+//        }
+//        cout << endl;
+//    }
+//}
 
 void Gameplay::Solve(pair<int, int> p)
 {
@@ -66,25 +66,21 @@ void Gameplay::Solve(pair<int, int> p)
     int x = a[p.first - 1][p.second], y = a[p.first][p.second - 1], z = a[p.first + 1][p.second], t = a[p.first][p.second + 1];
     // Kiểm tra xem ô nào trống thì đổi chỗ và vị trí của ô trống với ô đang xét
     if (!x) {
-        //cout << "HELLO x: " << x << endl;
         swap(a[p.first - 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!y) {
-        //cout << "HELLO y: " << y << endl;
         swap(a[p.first][p.second - 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!z) {
-        //cout << "HELLO z: " << z << endl;
         swap(a[p.first + 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
         return;
     }
     if (!t) {
-        //cout << "HELLO t: " << t << endl;
         swap(a[p.first][p.second + 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
         return;
@@ -277,12 +273,6 @@ void Gameplay::AuToRun()
         KQ.push_back(FATHER[l]);
         l = FATHER[l];
     }
-    //cout << KQ.size() << endl;
-    //for (int i = KQ.size() - 1; i >= 0; i--) {
-    //    cout << FRINGE[KQ[i]].second << endl;
-    //    display(FRINGE[KQ[i]].first);
-    //    cout << endl;
-    //}
 }
 
 void Gameplay::Clear()
@@ -352,33 +342,6 @@ SDL_Event Gameplay::event;
 SDL_Texture* PlayerTex;
 SDL_Rect srcR, destR;
 
-//void Gameplay::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
-//    int flags = 0;
-//
-//    if (fullscreen) {
-//        flags = SDL_WINDOW_FULLSCREEN;
-//    }
-//
-//    if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
-//        cout << "Subsystems Initialised!..." << endl;
-//        gwindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-//        if (window) {
-//            cout << "Window created!" << endl;
-//        }
-//
-//        renderer = SDL_CreateRenderer(window, -1, 0);
-//        if (renderer) {
-//            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-//            cout << "Renderer created!" << endl;
-//        }
-//
-//        isRunning = true;
-//    }
-//    else {
-//        isRunning = false;
-//    }
-//}
-
 void Gameplay::SetUpGame(int height)
 {
     // Hàm tạo các đối tượng ( các mảnh của puzzle ) gồm tọa độ, file ảnh, vị trí ảnh
@@ -417,6 +380,7 @@ void Gameplay::handleEvents() {
         {
             // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
             int x = a[pa.first + 1][pa.second];
+            
             if (x != n * n) {
                 swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
                 swap(posIMG[x], posIMG[0]);
@@ -458,9 +422,11 @@ void Gameplay::handleEvents() {
     {
         // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
         int x = event.motion.x, y = event.motion.y;
-        int H = Height / n;
+        cout << x << " " << y << endl;
+        int H = 589 / n;
         // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
         int Px = x / H * H, Py = y / H * H;
+        cout << "Px = " << Px << " Py = " << Py << endl;
         int P = checkPos({ Px, Py });
         if (P)
         {
@@ -479,7 +445,6 @@ void Gameplay::SolveGame()
 {
     // Hàm giải game bằng AI
     AuToRun();
-    //handleEvents();
     update();
     render();
     SDL_Delay(1000);
@@ -492,18 +457,11 @@ void Gameplay::SolveGame()
         }
         // Tìm vị trị trong mảng KQ và cập nhật lại các ảnh của trạng thái đang xét đến
         int x = FRINGE[KQ[i]].second;
-        //display(FRINGE[i].first);
         Solve(Pos(x, a));
-        //StartEvents();
         update();
         render();
 
         SDL_Delay(500);
-        /*frameTime = SDL_GetTicks() - frameStart;
-
-        if (frameDelay > frameTime) {
-            SDL_Delay(frameDelay - frameTime);
-        }*/
     }
     isRunning = false;
     if (!isQuit) {
@@ -513,8 +471,6 @@ void Gameplay::SolveGame()
             while (SDL_PollEvent(&e) != 0) {
                 if (e.type == SDL_QUIT) isQuit = true;
             }
-        //SDL_Delay(500);
-        //SDL_Delay(10000);
     }
 }
 
@@ -524,7 +480,7 @@ void Gameplay::update() {
     // Hàm cập nhật lại các tọa độ của các đối tượng của game ( các mảnh puzzle )
     for (int i = 0; i <= n * n - 1; i++)
     {
-        Number[i]->Update(posIMG[i].first, posIMG[i].second, Height / n, Height / n, Height / n, Height / n);
+        Number[i]->Update(posIMG[i].first, posIMG[i].second, Height / n, Height  / n, 589 / n, 589 / n);
     }
 }
 
@@ -546,14 +502,9 @@ void Gameplay::Play()
 {
     // Hàm để chơi game bằng bàn phím và chuột
     while (running()) {
-        //frameStart = SDL_GetTicks();
         handleEvents();
         update();
         render();
-        //frameTime = SDL_GetTicks() - frameStart;
-        //if (frameDelay > frameTime) {
-        //    SDL_Delay(frameDelay - frameTime);
-        //}
         if (!running())
         {
             if (CheckGoal(a))
@@ -575,7 +526,7 @@ void Gameplay::clean() {
 
 
 void Gameplay::Run(bool isPlay) {
-    SetUpGame(SCREEN_HEIGHT);
+    SetUpGame(594);
     if (isPlay)
         Play();
     else
