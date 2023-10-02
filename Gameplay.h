@@ -37,6 +37,7 @@ public:
 			PosG[i] = { 410, (i + 1) * 100 + 30};
 			WH[i] = { 180, 60 };
 		}
+        isRunning = true;
 		isRunning2 = true;
     }
     void SetUpGame(int Height);
@@ -58,7 +59,7 @@ public:
     vector<vector<int>> getGoal();
     pair<int, int> getPosImg(int i);
     int getN();
-    void init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+    bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
     void handleEvents();
     void Play();
     void update();
