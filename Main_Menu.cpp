@@ -18,7 +18,7 @@ bool MainMenu::init() {
         success = false;
     }
     else {
-        gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("Main Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (gWindow == NULL) {
             success = false;
         }
@@ -58,7 +58,7 @@ bool MainMenu::loadMedia() {
     else if (!Start.loadFromFile("IMG/Start.PNG")) {
         success = false;
     }
-    else if (!Help.loadFromFile("IMG/Help.PNG")) {
+    else if (!BHelp.loadFromFile("IMG/Help.PNG")) {
         success = false;
     }
     else if (!Exit.loadFromFile("IMG/Exit.PNG")) {
@@ -67,7 +67,7 @@ bool MainMenu::loadMedia() {
     else {
         MTexture.Resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
-            gSpriteClips[i].x = 0;
+            gSpriteClips[i].x = 1;
             gSpriteClips[i].y = 93 * i + 10;
             gSpriteClips[i].w = BUTTON_WIDTH;
             gSpriteClips[i].h = BUTTON_HEIGHT;
@@ -77,9 +77,9 @@ bool MainMenu::loadMedia() {
         mInstructionsButton = { (SCREEN_WIDTH - BUTTON_WIDTH) / 2, 3 * SCREEN_HEIGHT / 5 + 92 , BUTTON_WIDTH, BUTTON_HEIGHT };
         mExitButton = { (SCREEN_WIDTH - BUTTON_WIDTH) / 2, 3 * SCREEN_HEIGHT / 5 + 2 * 92, BUTTON_WIDTH, BUTTON_HEIGHT };
 
-        gButtons[BUTTON_PLAY].SetPosition(mPlayButton.x, mPlayButton.y);
-        gButtons[BUTTON_INSTRUCTIONS].SetPosition(mInstructionsButton.x, mInstructionsButton.y);
-        gButtons[BUTTON_EXIT].SetPosition(mExitButton.x, mExitButton.y);
+        gButtons[BUTTON_PLAY].SetAllValue(mPlayButton.x, mPlayButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        gButtons[BUTTON_INSTRUCTIONS].SetAllValue(mInstructionsButton.x, mInstructionsButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        gButtons[BUTTON_EXIT].SetAllValue(mExitButton.x, mExitButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
     }
 
     return success;
@@ -124,7 +124,7 @@ void MainMenu::run() {
             for (int i = 0; i < TOTAL_BUTTONS; ++i) {
                 gButtons[i].HandleEvent(&e);
                 gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
-                gButtons[BUTTON_INSTRUCTIONS].render(Help, gSpriteClips);
+                gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
                 gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
                 SDL_RenderPresent(gRenderer);
 
@@ -132,31 +132,23 @@ void MainMenu::run() {
                 if (e.type == SDL_MOUSEBUTTONDOWN && gButtons[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
                     switch (i) {
                     case BUTTON_PLAY:
+                    {
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
+                        MenuStart startgame;
+                        startgame.run();
                         Gameplay* game;
                         game = new Gameplay();
-                            game->SetStart();
-                            while (game->GetRunning2())
-                            {
-                                game->StartUpdate();
-                                game->StartRenderer();
-                                game->StartEvents();
-                                if (!game->GetRunning2())
-                                {
-                                    game->SetUpGame(SCREEN_HEIGHT);
-                                }
-                            }
-                            //game->SolveGame();
-                            game->Play();
-                            game->clean();
-                            game->Clear();
-                        delete game; // Giải phóng bộ nhớ sau khi trò chơi kết thúc
-                        game = nullptr;
+                        game->Run(TRUE);
                         break;
+                    }
                     case BUTTON_INSTRUCTIONS:
+                    {
                         // Thực hiện hành động khi nút INSTRUCTIONS_BUTTON được nhấn
                         //Chuyển đến màn hình hướng dẫn
+                        Help gamehelp;
+                        gamehelp.run();
                         break;
+                    }
                     case BUTTON_EXIT:
                         // Thực hiện hành động khi nút EXIT_BUTTON được nhấn
                         mQuit = true; // Kết thúc game
@@ -174,7 +166,7 @@ void MainMenu::run() {
         MTexture.render(0, 0);
 
         gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
-        gButtons[BUTTON_INSTRUCTIONS].render(Help, gSpriteClips);
+        gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
         gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
         SDL_RenderPresent(gRenderer);
     }
