@@ -4,6 +4,8 @@
 #include "CommonFunc.h"
 #include "LTexture.h"
 #include "LButton.h"
+#include "Help.h"
+#include "MenuStart.h"
 
 class MainMenu {
 public:
@@ -20,7 +22,7 @@ private:
 
     LTexture MTexture; //Background
     LTexture Start; //Start Button
-    LTexture Help; //Help Button
+    LTexture BHelp; //Help Button
     LTexture Exit; //Exit Button
     SDL_Rect mPlayButton;
     SDL_Rect mInstructionsButton;

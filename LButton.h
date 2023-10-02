@@ -13,12 +13,7 @@ public:
 
 	//Sets Top Left Position
 	void SetPosition(int x, int y);
-
-	//Set Texture 
-	void SetTexture(const LTexture& Texture) {
-		mTexture = Texture;
-	}
-
+	void SetAllValue(int x, int y, int BUTTOM_WIDTH, int BUTTOM_HEIGHT);
 	//Handle Event 
 	void HandleEvent(SDL_Event* e);
 
@@ -35,9 +30,6 @@ private:
 
 	//Currently Used global sprite
 	LButtonSprite mCurrentSprite;
-
-	//Button
-	LTexture mTexture;
 };
 
 #endif // ! LBUTTON_H_
