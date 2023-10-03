@@ -77,6 +77,7 @@ void Gameplay::Random(int height)
                 //Tìm hàng chứa ô trống
                 if (a[i][j] == 0) zero = i;
                 b.erase(b.begin() + tmp);
+                //cout << posIMG[a[i][j]].first << " " << posIMG[a[i][j]].second << endl;
             }
         }
         CheckRand();
@@ -84,18 +85,18 @@ void Gameplay::Random(int height)
     }
 }
 
-//void Gameplay::display(vector<vector<int>> a)
-//{
-//    //Hàm in ra màn hình
-//    cnt = 1;
-//    for (int i = 1; i <= n; i++) {
-//        for (int j = 1; j <= n; j++) {
-//            printf("%3d ", a[i][j]);
-//            if (a[i][j] != Goal[i][j]) cnt = 0;
-//        }
-//        cout << endl;
-//    }
-//}
+void Gameplay::display(vector<vector<int>> a)
+{
+    //Hàm in ra màn hình
+    cnt = 1;
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            printf("%3d ", a[i][j]);
+            if (a[i][j] != Goal[i][j]) cnt = 0;
+        }
+        cout << endl;
+    }
+}
 
 void Gameplay::Solve(pair<int, int> p)
 {
@@ -180,6 +181,7 @@ int Gameplay::Heuristic(vector<vector<int>> a)
 
 void Gameplay::KhoiTao()
 {
+    cout << "BYE\n";
     // Hàm khởi tạo thêm vào FRINGE các trạng thái hợp lệ xung quanh ô trống
     pair<int, int> p = Pos(0, a);
     FRINGE[0].first = a;
@@ -191,7 +193,7 @@ void Gameplay::KhoiTao()
         FRINGE[res].first = tmp;
         FRINGE[res].second = x;
         int h = Heuristic(tmp);
-        // Thêm vào hàng đợi ưu tiền OPEN f ( = g + h), vị trí của mảng thêm vào (res), chi phí đi từ lúc đầu đến trạng thái hiện tại(g)
+        // Thêm vào hàng đợi ưu tiên OPEN f ( = g + h), vị trí của mảng thêm vào (res), chi phí đi từ lúc đầu đến trạng thái hiện tại(g)
         OPEN.push({ g + h, {g, res} });
         //Lưu cha của mảng thứ res là 0;
         FATHER[res] = 0;
@@ -231,6 +233,7 @@ void Gameplay::KhoiTao()
 
 void Gameplay::AuToRun()
 {
+    cout << "HELLO\n";
     //Khởi tạo trạng thái ban đầu.
     KhoiTao();
     // Curent là trạng thái đang xét hiện tại
@@ -303,7 +306,9 @@ void Gameplay::AuToRun()
                 res++;
             }
         }
-        //k++;
+        k++;
+        cout << k << endl;
+        display(Curent);
     }
     // Đẩy trạng thái đích vào KQ
     KQ.push_back(l);
@@ -323,7 +328,10 @@ void Gameplay::Clear()
     while (!OPEN.empty()) {
         OPEN.pop();
     }
+    res = 0;
 }
+
+
 
 void Gameplay::setA()
 {
@@ -368,7 +376,8 @@ int Gameplay::checkPos(pair<int, int> p)
     // Kiểm tra xem ô nào đang chứa tọa độ p ( dùng để xử lí sự kiện )
     for (int i = 1; i <= n * n - 1; i++)
     {
-        if (posIMG[i] == p) return i;
+        if (p.first >= posIMG[i].first && p.first <= posIMG[i].first + Height / n
+            && p.second >= posIMG[i].second && p.second <= posIMG[i].second + Height / n) return i;
     }
     return 0;
 }
@@ -400,19 +409,54 @@ void Gameplay::SetUpGame(int height)
     }
 }
 
-void Gameplay::handleEvents() {
-    // Hàm xử lí sự kiện để chơi trò chơi
+void Gameplay::HandleAuto()
+{
     bool isQuit = false;
     SDL_PollEvent(&event);
-    switch (event.type) 
+    switch (event.type)
     {
-        case SDL_QUIT:
-            isRunning = false;
-            isQuit = true;
-            break;
-        case SDL_KEYDOWN:
+    case SDL_QUIT:
+        isRunning = false;
+        isQuit = true;
+        break;
+
+    case SDL_MOUSEBUTTONDOWN:
+    {
+        // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
+        int x = event.motion.x, y = event.motion.y;
+        if (x >= 870 && x <= 1220 && y >= 540 && y <= 590)
         {
-            // Khi nhấn xuống phím bất kì thì ta sẽ tìm tọa độ vị trí ô trống
+            if (!checksolve)
+            {
+                checksolve = 1;
+            }
+            else
+            {
+                checksolve = 0;
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void Gameplay::handleEvents() {
+    //Hàm xử lí sự kiện để chơi trò chơi
+    bool isQuit = false;
+    SDL_PollEvent(&event);
+    switch (event.type)
+    {
+    case SDL_QUIT:
+        isRunning = false;
+        isQuit = true;
+        break;
+    case SDL_KEYDOWN:
+    {
+        // Khi nhấn xuống phím bất kì thì ta sẽ tìm tọa độ vị trí ô trống
+        if (!checksolve)
+        {
             pair<int, int> pa = Pos(0, a);
             switch (event.key.keysym.sym)
             {
@@ -420,7 +464,7 @@ void Gameplay::handleEvents() {
             {
                 // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
                 int x = a[pa.first + 1][pa.second];
-            
+
                 if (x != n * n) {
                     swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
@@ -458,24 +502,38 @@ void Gameplay::handleEvents() {
                 break;
             }
         }
-        case SDL_MOUSEBUTTONDOWN:
-        {
+    }
+    case SDL_MOUSEBUTTONDOWN:
+    {
             // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
-            int x = event.motion.x, y = event.motion.y;
-            cout << x << " " << y << endl;
-            int H = 589 / n;
-            // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
-            int Px = x / H * H, Py = y / H * H;
-            cout << "Px = " << Px << " Py = " << Py << endl;
-            int P = checkPos({ Px, Py });
-            if (P)
+        int x = event.motion.x, y = event.motion.y;
+        if (x >= 870 && x <= 1220 && y >= 540 && y <= 590)
+        {
+            if (!checksolve)
             {
-                Solve(Pos(P, a));
+                checksolve = 1;
+            }
+            else
+            {
+                checksolve = 0;
             }
             break;
         }
-        default:
+        if (!checksolve)
+        {
+             cout << x << " " << y << endl;
+             // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
+             int P = checkPos({ x, y });
+             if (P)
+             {
+                 Solve(Pos(P, a));
+             }
+             break;
+            }
+        }
             break;
+    default:
+        break;
     }
     // Nếu trạng thái hiện tại là trạng thái đích thì kết thúc vòng lặp, đánh giấu trò chơi đã dừng
     isRunning = !CheckGoal(a) && !isQuit;
@@ -492,6 +550,17 @@ void Gameplay::SolveGame()
     SDL_Event e;
     for (int i = KQ.size() - 1; i >= 0 && !isQuit; i--)
     {
+        HandleAuto();
+        if (!checksolve)
+        {
+            KQ.clear();
+            CLOSE.clear();
+            while (!OPEN.empty()) {
+                OPEN.pop();
+            }
+            res = 0;
+            return;
+        }
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) isQuit = true;
         }
@@ -500,7 +569,6 @@ void Gameplay::SolveGame()
         Solve(Pos(x, a));
         update();
         render();
-
         SDL_Delay(500);
     }
     isRunning = false;
@@ -550,6 +618,10 @@ void Gameplay::Play()
     // Hàm để chơi game bằng bàn phím và chuột
     while (running()) {
         handleEvents();
+        if (checksolve)
+        {
+            SolveGame();
+        }
         update();
         render();
         if (!running())
@@ -573,7 +645,6 @@ void Gameplay::clean() {
 
 
 void Gameplay::Run(bool isPlay) {
- 
     if (LoadMedia())
     {
         SetUpGame(594);

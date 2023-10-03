@@ -1,6 +1,4 @@
 #pragma once
-#ifndef GAME_PLAY_H_
-#define GAME_PLAY_H_
 
 #include "CommonFunc.h"
 #include "LTexture.h"
@@ -23,7 +21,7 @@ private:
     vector<pair<int, int >> p;
     int Height;
     bool isRunning;
-    int cnt, check, zero, res;
+    int cnt, check, zero, res, checksolve;
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
@@ -31,6 +29,7 @@ public:
     {
         cnt = 0;
         check = 0;
+        checksolve = 0;
         res = 1;
         isRunning = true;
     }
@@ -68,7 +67,5 @@ public:
     void Run(bool isPlay);
     static SDL_Event event;
     bool LoadMedia();
+    void HandleAuto();
 };
-
-
-#endif // !GAME_PLAY_H_
