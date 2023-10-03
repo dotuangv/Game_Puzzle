@@ -56,6 +56,13 @@ enum LButtonSprite
     BUTTON_SPRITE_TOTAL = 3
 };
 
+enum MenuButtons {
+    BUTTON_RELOAD = 0,
+    BUTTON_AUTO_RUN = 1,
+    BUTTON_SELF_SOLVING = 2,
+    BUTTON_BACK = 3,
+    TOTAL_GAMEPLAY_BUTTONS = 4
+};
 
 
 #endif

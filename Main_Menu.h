@@ -1,4 +1,5 @@
-﻿ #ifndef MAINMENU_H
+﻿#pragma once
+#ifndef MAINMENU_H
 #define MAINMENU_H
 
 #include "CommonFunc.h"
@@ -43,5 +44,4 @@ private:
 
     void renderText(const std::string& text, int x, int y);
 };
-
-    #endif // MAINMENU_H
+#endif // MAINMENU_H
