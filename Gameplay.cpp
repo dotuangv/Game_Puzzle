@@ -34,7 +34,7 @@ void Gameplay::Random(int height)
                 int tmp = (rand() + tam++) % b.size();
                 a[i][j] = b[tmp];
                 //Tính tọa độ ảnh
-                posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 87 };
+                posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 85 };
                 //Tìm hàng chứa ô trống
                 if (a[i][j] == 0) zero = i;
                 b.erase(b.begin() + tmp);
