@@ -44,7 +44,7 @@ bool MenuStart::loadMedia() {
     }
     else
     {
-        for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
+         for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
             gSpriteClips[i].x = 12;
             gSpriteClips[i].y = 10 + 144 * i;
             gSpriteClips[i].w = 144;

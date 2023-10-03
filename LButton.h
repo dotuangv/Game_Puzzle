@@ -1,15 +1,12 @@
 #pragma once
 #ifndef  LBUTTON_H_
 #define LBUTTON_H_
-#include "LTexture.h"
+#include "LTexture.h" 
 
 class LButton {
 public:
 	//Initialize internal variable
 	LButton();
-
-	//Initialize Button with Texture
-	LButton(const LTexture &Texture);
 
 	//Sets Top Left Position
 	void SetPosition(int x, int y);
@@ -19,6 +16,7 @@ public:
 
 	//Shows button sprites
 	void render(LTexture& gButtonSpriteSheetTexture, SDL_Rect gSpriteClips[]);
+
 	LButtonSprite getCurrentSprite();
 private:
 	// Top left Position of Button

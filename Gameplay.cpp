@@ -1,5 +1,44 @@
 ﻿#include "Gameplay.h"
-#include "Game.h"
+#include "LButton.h"
+
+LButton gButton[TOTAL_GAMEPLAY_BUTTONS];
+LTexture GamePlayButton[TOTAL_GAMEPLAY_BUTTONS];
+SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
+
+bool Gameplay::LoadMedia() 
+{
+    bool success = true;
+    if (!GamePlayButton[BUTTON_AUTO_RUN].loadFromFile("IMG//AutoRun.png"))
+    {
+        success = false;
+    }
+    else if (!GamePlayButton[BUTTON_BACK].loadFromFile("IMG//Back.png"))
+    {
+        success = false;
+    }
+    else if (!GamePlayButton[BUTTON_RELOAD].loadFromFile("IMG//Reload.png"))
+    {
+        success = false;
+    }
+    else if (!GamePlayButton[BUTTON_SELF_SOLVING].loadFromFile("IMG//SelfSolving.png"))
+    {
+        success = false;
+    }
+    else {
+        for (int i = 0; i < 2; ++i) {
+            gSpriteClips[i].x = 50;
+            gSpriteClips[i].y = 190 * i;
+            gSpriteClips[i].w = 527;
+            gSpriteClips[i].h = 180;
+        }
+        gButton[BUTTON_AUTO_RUN].SetAllValue(810, 490, 339, 64);
+        gButton[BUTTON_RELOAD].SetAllValue(810, 360, 360, 180);
+        gButton[BUTTON_SELF_SOLVING].SetAllValue(806, 570, 332, 128);
+        gButton[BUTTON_BACK].SetAllValue(SCREEN_WIDTH,0, 128, 128);
+
+    }
+    return success;
+}
 
 void Gameplay::CheckRand()
 {
@@ -365,77 +404,78 @@ void Gameplay::handleEvents() {
     // Hàm xử lí sự kiện để chơi trò chơi
     bool isQuit = false;
     SDL_PollEvent(&event);
-    switch (event.type) {
-    case SDL_QUIT:
-        isRunning = false;
-        isQuit = true;
-        break;
-    case SDL_KEYDOWN:
+    switch (event.type) 
     {
-        // Khi nhấn xuống phím bất kì thì ta sẽ tìm tọa độ vị trí ô trống
-        pair<int, int> pa = Pos(0, a);
-        switch (event.key.keysym.sym)
+        case SDL_QUIT:
+            isRunning = false;
+            isQuit = true;
+            break;
+        case SDL_KEYDOWN:
         {
-        case SDLK_UP:
-        {
-            // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
-            int x = a[pa.first + 1][pa.second];
+            // Khi nhấn xuống phím bất kì thì ta sẽ tìm tọa độ vị trí ô trống
+            pair<int, int> pa = Pos(0, a);
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_UP:
+            {
+                // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
+                int x = a[pa.first + 1][pa.second];
             
-            if (x != n * n) {
-                swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
-                swap(posIMG[x], posIMG[0]);
+                if (x != n * n) {
+                    swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
+                    swap(posIMG[x], posIMG[0]);
+                }
+                break;
             }
-            break;
-        }
-        case SDLK_DOWN:
-        {
-            int x = a[pa.first - 1][pa.second];
-            if (x != n * n) {
-                swap(a[pa.first - 1][pa.second], a[pa.first][pa.second]);
-                swap(posIMG[x], posIMG[0]);
+            case SDLK_DOWN:
+            {
+                int x = a[pa.first - 1][pa.second];
+                if (x != n * n) {
+                    swap(a[pa.first - 1][pa.second], a[pa.first][pa.second]);
+                    swap(posIMG[x], posIMG[0]);
+                }
+                break;
             }
-            break;
-        }
-        case SDLK_LEFT:
-        {
-            int x = a[pa.first][pa.second + 1];
-            if (x != n * n) {
-                swap(a[pa.first][pa.second + 1], a[pa.first][pa.second]);
-                swap(posIMG[x], posIMG[0]);
+            case SDLK_LEFT:
+            {
+                int x = a[pa.first][pa.second + 1];
+                if (x != n * n) {
+                    swap(a[pa.first][pa.second + 1], a[pa.first][pa.second]);
+                    swap(posIMG[x], posIMG[0]);
+                }
+                break;
             }
-            break;
+            case SDLK_RIGHT:
+            {
+                int x = a[pa.first][pa.second - 1];
+                if (x != n * n) {
+                    swap(a[pa.first][pa.second - 1], a[pa.first][pa.second]);
+                    swap(posIMG[x], posIMG[0]);
+                }
+                break;
+            }
+            default:
+                break;
+            }
         }
-        case SDLK_RIGHT:
+        case SDL_MOUSEBUTTONDOWN:
         {
-            int x = a[pa.first][pa.second - 1];
-            if (x != n * n) {
-                swap(a[pa.first][pa.second - 1], a[pa.first][pa.second]);
-                swap(posIMG[x], posIMG[0]);
+            // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
+            int x = event.motion.x, y = event.motion.y;
+            cout << x << " " << y << endl;
+            int H = 589 / n;
+            // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
+            int Px = x / H * H, Py = y / H * H;
+            cout << "Px = " << Px << " Py = " << Py << endl;
+            int P = checkPos({ Px, Py });
+            if (P)
+            {
+                Solve(Pos(P, a));
             }
             break;
         }
         default:
             break;
-        }
-    }
-    case SDL_MOUSEBUTTONDOWN:
-    {
-        // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
-        int x = event.motion.x, y = event.motion.y;
-        cout << x << " " << y << endl;
-        int H = 589 / n;
-        // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
-        int Px = x / H * H, Py = y / H * H;
-        cout << "Px = " << Px << " Py = " << Py << endl;
-        int P = checkPos({ Px, Py });
-        if (P)
-        {
-            Solve(Pos(P, a));
-        }
-        break;
-    }
-    default:
-        break;
     }
     // Nếu trạng thái hiện tại là trạng thái đích thì kết thúc vòng lặp, đánh giấu trò chơi đã dừng
     isRunning = !CheckGoal(a) && !isQuit;
@@ -487,9 +527,16 @@ void Gameplay::update() {
 void Gameplay::render() {
     // Hàm hiển thị hình ảnh các đối tượng của game ra màn hình ( các mảnh puzzle )
     SDL_RenderClear(gRenderer);
-    LTexture Background;
+    LTexture Background, GoalImage;
     Background.loadFromFile("IMG//PlayGame.PNG");
+    GoalImage.loadFromFile("Data//anhYourName.png");
+    GoalImage.Resize(234, 234);
     Background.render(0, 0);
+    GoalImage.render(928, 52);
+    for (int i = 0; i < TOTAL_GAMEPLAY_BUTTONS; ++i)
+        gButton[i].HandleEvent(&event);
+    for (int j = 0; j < TOTAL_GAMEPLAY_BUTTONS; ++j)
+        gButton[j].render(GamePlayButton[j], gSpriteClips);
     for (int i = 1; i <= n * n - 1; i++)
     {
         Number[i]->Render();
@@ -526,11 +573,15 @@ void Gameplay::clean() {
 
 
 void Gameplay::Run(bool isPlay) {
-    SetUpGame(594);
-    if (isPlay)
-        Play();
-    else
-        SolveGame();
-    clean();
-    Clear();
+ 
+    if (LoadMedia())
+    {
+        SetUpGame(594);
+        if (isPlay)
+            Play();
+        else
+            SolveGame();
+        clean();
+        Clear();
+    }
 }

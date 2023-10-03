@@ -10,6 +10,7 @@ private:
     LTexture HTexture;
     vector<LTexture> MenuStartButton;
     bool isRunning;
+    
     enum StartButton
     {
         BUTTON_MODE_3 = 0,
@@ -20,6 +21,7 @@ private:
         BUTTON_TURN_RIGHT = 5,
         START_BUTTON_TOTAL = 6
     };
+
     SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
     SDL_Rect gRect[START_BUTTON_TOTAL];
     LButton gButton[START_BUTTON_TOTAL];
