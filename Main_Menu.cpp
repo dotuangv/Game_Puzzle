@@ -123,11 +123,6 @@ void MainMenu::run() {
 
             for (int i = 0; i < TOTAL_BUTTONS; ++i) {
                 gButtons[i].HandleEvent(&e);
-                gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
-                gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
-                gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
-                SDL_RenderPresent(gRenderer);
-
                 // Xác định nút nào được nhấn và thực hiện tác vụ tương ứng
                 if (e.type == SDL_MOUSEBUTTONDOWN && gButtons[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
                     switch (i) {
