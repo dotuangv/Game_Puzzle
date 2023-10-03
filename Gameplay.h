@@ -1,6 +1,10 @@
 #pragma once
+#ifndef GAME_PLAY_H_
+#define GAME_PLAY_H_
+
 #include "CommonFunc.h"
 #include "LTexture.h"
+//#include "LButton.h"
 
 using namespace std;
 
@@ -23,7 +27,7 @@ private:
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
-        posIMG(vector<pair<int, int>>(6*6 + 1)), FRINGE(100000, pair<vector<vector<int>>, int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)), FATHER(vector<int>(100000))
+        posIMG(vector<pair<int, int>>(6 * 6 + 1)), FRINGE(100000, pair<vector<vector<int>>, int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)), FATHER(vector<int>(100000))
     {
         cnt = 0;
         check = 0;
@@ -44,7 +48,7 @@ public:
     void Clear();
     void setA();
     void setGoal();
-    vector<vector<int>> getA();  
+    vector<vector<int>> getA();
     vector<vector<int>> getGoal();
     pair<int, int> getPosImg(int i);
     bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
@@ -63,4 +67,8 @@ public:
     int checkPos(pair<int, int> p);
     void Run(bool isPlay);
     static SDL_Event event;
+    bool LoadMedia();
 };
+
+
+#endif // !GAME_PLAY_H_
