@@ -7,10 +7,6 @@ MenuStart::~MenuStart() {
     close();
 }
 
-bool MenuStart::init() {
-    return true;
-}
-
 bool MenuStart::loadMedia() {
     bool success = true;
 
@@ -76,9 +72,6 @@ void MenuStart::close() {
 }
 
 void MenuStart::run() {
-    if (!init()) {
-        return;
-    }
     if (!loadMedia())
     {
         std::cout << "Fail to Load Media \n";
@@ -95,10 +88,6 @@ void MenuStart::run() {
 
                 for (int i = 0; i < START_BUTTON_TOTAL; ++i) {
                     gButton[i].HandleEvent(&e);
-                    for (int j = 0; j < START_BUTTON_TOTAL; ++j)
-                        gButton[i].render(MenuStartButton[i], gSpriteClips);
-                    SDL_RenderPresent(gRenderer);
-
                     // Xác định nút nào được nhấn và thực hiện tác vụ tương ứng
                     if (e.type == SDL_MOUSEBUTTONDOWN && gButton[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
                         switch (i) {
@@ -150,7 +139,6 @@ void MenuStart::run() {
             }
             SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(gRenderer);
-
             HTexture.render(0, 0);
             for (int i = 0; i < START_BUTTON_TOTAL; ++i)
             {

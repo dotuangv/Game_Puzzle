@@ -3,6 +3,7 @@
 
 LButton gButton[TOTAL_GAMEPLAY_BUTTONS];
 LTexture GamePlayButton[TOTAL_GAMEPLAY_BUTTONS];
+LTexture ButtonBack, ButtonReload;
 SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
 
 bool Gameplay::LoadMedia() 
@@ -12,11 +13,11 @@ bool Gameplay::LoadMedia()
     {
         success = false;
     }
-    else if (!GamePlayButton[BUTTON_BACK].loadFromFile("IMG//Back.png"))
+    else if (!ButtonBack.loadFromFile("IMG//Back.png"))
     {
         success = false;
     }
-    else if (!GamePlayButton[BUTTON_RELOAD].loadFromFile("IMG//Reload.png"))
+    else if (!ButtonReload.loadFromFile("IMG//Reload.png"))
     {
         success = false;
     }
@@ -25,16 +26,16 @@ bool Gameplay::LoadMedia()
         success = false;
     }
     else {
-        for (int i = 0; i < 2; ++i) {
-            gSpriteClips[i].x = 50;
-            gSpriteClips[i].y = 190 * i;
-            gSpriteClips[i].w = 527;
-            gSpriteClips[i].h = 180;
+        for (int i = 0; i < 3; ++i) {
+            gSpriteClips[i].x = 0;
+            gSpriteClips[i].y = 165 * i + 10;
+            gSpriteClips[i].w = 380;
+            gSpriteClips[i].h = 165;
         }
         gButton[BUTTON_AUTO_RUN].SetAllValue(810, 490, 339, 64);
-        gButton[BUTTON_RELOAD].SetAllValue(810, 360, 360, 180);
-        gButton[BUTTON_SELF_SOLVING].SetAllValue(806, 570, 332, 128);
-        gButton[BUTTON_BACK].SetAllValue(SCREEN_WIDTH,0, 128, 128);
+        //gButton[BUTTON_RELOAD].SetAllValue(810, 360, 180, 180);
+        gButton[BUTTON_SELF_SOLVING].SetAllValue(806, 570, 360, 128);
+        //gButton[BUTTON_BACK].SetAllValue(SCREEN_WIDTH,0, 128, 128);
 
     }
     return success;
@@ -390,24 +391,90 @@ SDL_Event Gameplay::event;
 SDL_Texture* PlayerTex;
 SDL_Rect srcR, destR;
 
+std::vector<SDL_Texture*> CutTextureIntoPieces(SDL_Texture* texture, int n) {
+    std::vector<SDL_Texture*> textures;
+
+    int textureWidth, textureHeight;
+    SDL_QueryTexture(texture, NULL, NULL, &textureWidth, &textureHeight);
+
+    int pieceWidth = textureWidth / n;
+    int pieceHeight = textureHeight / n;
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            SDL_Rect srcRect = { j * pieceWidth, i * pieceHeight, pieceWidth, pieceHeight };
+            SDL_Texture* pieceTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, pieceWidth, pieceHeight);
+
+            // Thiết lập mục tiêu vẽ cho texture
+            SDL_SetRenderTarget(gRenderer, pieceTexture);
+
+            // Xóa texture
+            SDL_RenderClear(gRenderer);
+
+            // Sao chép một phần của texture gốc vào texture đích
+            SDL_RenderCopy(gRenderer, texture, &srcRect, NULL);
+
+            // Đặt lại mục tiêu vẽ về texture gốc
+            SDL_SetRenderTarget(gRenderer, NULL);
+
+            textures.push_back(pieceTexture);
+        }
+    }
+
+    return textures;
+}
+
 void Gameplay::SetUpGame(int height)
 {
-    // Hàm tạo các đối tượng ( các mảnh của puzzle ) gồm tọa độ, file ảnh, vị trí ảnh
     setA();
     Random(height);
     setGoal();
+    //Load ảnh lớn
+    SDL_Surface* imageSurface = IMG_Load("Data//anhYourName.png");
+    SDL_Texture* largeTexture = SDL_CreateTextureFromSurface(gRenderer, imageSurface);
+    SDL_FreeSurface(imageSurface);
+    // Tính kích thước của mỗi phần nhỏ
+    int smallWidth = 589 / n;
+    vector<SDL_Texture*> CutPicture;
+    CutPicture = CutTextureIntoPieces(largeTexture, n);
     Number = new GameObject * [n * n + 1];
-    const char* s1 = "Data/YourName";
-    const char* s2 = "-";
-    const char* s3 = ".png";
-    string N = to_string(n);
-    for (int i = 0; i <= n * n - 1; i++) {
-        string str = to_string(i);
-        string s = s1 + N + s2 + str + s3;
-        const char* filename = s.c_str();
-        Number[i] = new GameObject(filename, gRenderer, posIMG[i].first, posIMG[i].second, n);
+
+    // Tạo và lưu các phần nhỏ vào mảng Number
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            Number[i * n + j] = new GameObject(CutPicture[i * n + j], gRenderer, posIMG[i * n + j].first, posIMG[i * n + j].second);
+        }
     }
+
+    //Giải phóng
+    for (int i = 0; i < CutPicture.size(); ++i)
+    {
+        SDL_DestroyTexture(largeTexture);
+        CutPicture[i] = NULL;
+    }
+    CutPicture.clear();
 }
+
+
+//void Gameplay::SetUpGame(int height)
+//{
+//    // Hàm tạo các đối tượng ( các mảnh của puzzle ) gồm tọa độ, file ảnh, vị trí ảnh
+//    setA();
+//    Random(height);
+//    setGoal();
+//    Number = new GameObject * [n * n + 1];
+//    const char* s1 = "Data/YourName";
+//    const char* s2 = "-";
+//    const char* s3 = ".png";
+//    string N = to_string(n);
+//    for (int i = 0; i <= n * n - 1; i++) 
+//    {
+//        string str = to_string(i);
+//        string s = s1 + N + s2 + str + s3;
+//        const char* filename = s.c_str();
+//        Number[i] = new GameObject(filename, gRenderer, posIMG[i].first, posIMG[i].second, n);
+//    }
+//}
 
 void Gameplay::HandleAuto()
 {
@@ -428,6 +495,7 @@ void Gameplay::HandleAuto()
         {
             if (!checksolve)
             {
+                gButton[BUTTON_AUTO_RUN].render(GamePlayButton[BUTTON_AUTO_RUN], gSpriteClips, BUTTON_SPRITE_MOUSE_DOWN);
                 checksolve = 1;
             }
             else
@@ -509,6 +577,7 @@ void Gameplay::handleEvents() {
         int x = event.motion.x, y = event.motion.y;
         if (x >= 870 && x <= 1220 && y >= 540 && y <= 590)
         {
+            gButton[BUTTON_AUTO_RUN].HandleEvent(&event);
             if (!checksolve)
             {
                 checksolve = 1;
