@@ -1,15 +1,29 @@
 ﻿#include "Gameplay.h"
 #include "LButton.h"
 
-LButton gButton[TOTAL_GAMEPLAY_BUTTONS];
-LTexture GamePlayButton[TOTAL_GAMEPLAY_BUTTONS];
-LTexture ButtonBack, ButtonReload;
-SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
+LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture;
+LButton gButtonBack, gButtonReload, gButtonAutoRun;
+
+SDL_Rect ButtonReloadRect[] = { {0, 0, 142, 142}, {0, 175, 142, 142}, {0,350 , 142, 142} };
+SDL_Rect ButtonBackRect[] = { {0, 0, 156, 156}, {0, 180, 156, 156}, {0, 361, 156, 156} };
+SDL_Rect ButtonAutoRunRect[] = { {0, 0, 327, 65}, {0, 182, 327, 65}, {0, 356, 327, 65} };
+SDL_Rect ButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
+LTimer timer;
+LTexture timing;
+Mix_Chunk* gSlide = NULL;
+Mix_Music* gSoundTrack = NULL;
+
+LTexture Background, GoalImage;
 
 bool Gameplay::LoadMedia() 
 {
     bool success = true;
-    if (!GamePlayButton[BUTTON_AUTO_RUN].loadFromFile("IMG//AutoRun.png"))
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+    if (!ButtonAutoRun.loadFromFile("IMG//AutoRun.png"))
     {
         success = false;
     }
@@ -21,24 +35,46 @@ bool Gameplay::LoadMedia()
     {
         success = false;
     }
-    else if (!GamePlayButton[BUTTON_SELF_SOLVING].loadFromFile("IMG//SelfSolving.png"))
+    else if (!ButtonMode.loadFromFile("IMG//Mode.png"))
     {
         success = false;
     }
+    else if (!Background.loadFromFile("IMG//PlayGame.PNG"))
+    {
+        success = false;
+    }
+    else if (!GoalImage.loadFromFile("Data//anhYourName.png"))
+    {
+        success = false;
+    }
+    else if (!(gSoundTrack = Mix_LoadMUS("Music//Rondo Alla.mp3")))
+    {
+        printf("Failed to load SoundTrack! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
+    else if (!(gSlide = Mix_LoadWAV("Music//low.wav")))
+    {
+        printf("Failed to load gSlide sound effect! SDL_mixer Error: %s\n", Mix_GetError());
+        success = false;
+    }
     else {
-        for (int i = 0; i < 3; ++i) {
-            gSpriteClips[i].x = 0;
-            gSpriteClips[i].y = 165 * i + 10;
-            gSpriteClips[i].w = 380;
-            gSpriteClips[i].h = 165;
-        }
-        gButton[BUTTON_AUTO_RUN].SetAllValue(810, 490, 339, 64);
-        //gButton[BUTTON_RELOAD].SetAllValue(810, 360, 180, 180);
-        gButton[BUTTON_SELF_SOLVING].SetAllValue(806, 570, 360, 128);
-        //gButton[BUTTON_BACK].SetAllValue(SCREEN_WIDTH,0, 128, 128);
-
+        gButtonReload.SetAllValue(985, 357, 142, 142);
+        gButtonAutoRun.SetAllValue(896, 523, 327, 65);
+        gButtonBack.SetAllValue((SCREEN_WIDTH - 156 / 2), - (156 / 2), 156, 156);
     }
     return success;
+}
+
+std::string millisecondsToTimeString(Uint32 milliseconds) {
+    Uint32 seconds = milliseconds / 1000; // Chuyển từ mili giây sang giây
+    Uint32 minutes = seconds / 60; // Chuyển từ giây sang phút
+    seconds %= 60; // Lấy số giây còn lại sau khi tính phút
+
+    // Sử dụng std::to_string để chuyển số thành chuỗi và đảm bảo rằng chúng có hai chữ số
+    std::string mm = (minutes < 10 ? "0" : "") + std::to_string(minutes);
+    std::string ss = (seconds < 10 ? "0" : "") + std::to_string(seconds);
+
+    return mm + " : " + ss;
 }
 
 void Gameplay::CheckRand()
@@ -109,21 +145,45 @@ void Gameplay::Solve(pair<int, int> p)
     if (!x) {
         swap(a[p.first - 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
         return;
     }
     if (!y) {
         swap(a[p.first][p.second - 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
         return;
     }
     if (!z) {
         swap(a[p.first + 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
         return;
     }
     if (!t) {
         swap(a[p.first][p.second + 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
         return;
     }
 }
@@ -308,8 +368,8 @@ void Gameplay::AuToRun()
             }
         }
         k++;
-        cout << k << endl;
-        display(Curent);
+        //cout << k << endl;
+ //       display(Curent);
     }
     // Đẩy trạng thái đích vào KQ
     KQ.push_back(l);
@@ -440,13 +500,11 @@ void Gameplay::SetUpGame(int height)
     Number = new GameObject * [n * n + 1];
 
     // Tạo và lưu các phần nhỏ vào mảng Number
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            Number[i * n + j] = new GameObject(CutPicture[i * n + j], gRenderer, posIMG[i * n + j].first, posIMG[i * n + j].second);
-        }
+    Number[0] = new GameObject(CutPicture[n * n - 1], gRenderer, posIMG[0].first, posIMG[0].second);
+    for (int i = 1; i < n * n; i++)
+    {
+        Number[i] = new GameObject(CutPicture[i - 1], gRenderer, posIMG[i].first, posIMG[i].second);
     }
-
-    //Giải phóng
     for (int i = 0; i < CutPicture.size(); ++i)
     {
         SDL_DestroyTexture(largeTexture);
@@ -454,27 +512,6 @@ void Gameplay::SetUpGame(int height)
     }
     CutPicture.clear();
 }
-
-
-//void Gameplay::SetUpGame(int height)
-//{
-//    // Hàm tạo các đối tượng ( các mảnh của puzzle ) gồm tọa độ, file ảnh, vị trí ảnh
-//    setA();
-//    Random(height);
-//    setGoal();
-//    Number = new GameObject * [n * n + 1];
-//    const char* s1 = "Data/YourName";
-//    const char* s2 = "-";
-//    const char* s3 = ".png";
-//    string N = to_string(n);
-//    for (int i = 0; i <= n * n - 1; i++) 
-//    {
-//        string str = to_string(i);
-//        string s = s1 + N + s2 + str + s3;
-//        const char* filename = s.c_str();
-//        Number[i] = new GameObject(filename, gRenderer, posIMG[i].first, posIMG[i].second, n);
-//    }
-//}
 
 void Gameplay::HandleAuto()
 {
@@ -495,8 +532,10 @@ void Gameplay::HandleAuto()
         {
             if (!checksolve)
             {
-                gButton[BUTTON_AUTO_RUN].render(GamePlayButton[BUTTON_AUTO_RUN], gSpriteClips, BUTTON_SPRITE_MOUSE_DOWN);
+                //gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect, BUTTON_SPRITE_MOUSE_DOWN);
                 checksolve = 1;
+                if (timer.isStarted() && !timer.isPaused())
+                    timer.pause();
             }
             else
             {
@@ -532,10 +571,16 @@ void Gameplay::handleEvents() {
             {
                 // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
                 int x = a[pa.first + 1][pa.second];
-
                 if (x != n * n) {
                     swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    if (!checksolve)
+                    {
+                        ++step;
+                        if (!timer.isStarted())
+                            timer.start();
+                        Mix_PlayChannel(-1, gSlide, 0);
+                    }
                 }
                 break;
             }
@@ -545,6 +590,13 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first - 1][pa.second], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    if (!checksolve)
+                    {
+                        ++step;
+                        if (!timer.isStarted())
+                            timer.start();
+                        Mix_PlayChannel(-1, gSlide, 0);
+                    }
                 }
                 break;
             }
@@ -554,6 +606,13 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first][pa.second + 1], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    if (!checksolve)
+                    {
+                        ++step;
+                        if (!timer.isStarted())
+                            timer.start();
+                        Mix_PlayChannel(-1, gSlide, 0);
+                    }
                 }
                 break;
             }
@@ -563,6 +622,13 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first][pa.second - 1], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    if (!checksolve)
+                    {
+                        ++step;
+                        if (!timer.isStarted())
+                            timer.start();
+                        Mix_PlayChannel(-1, gSlide, 0);
+                    }
                 }
                 break;
             }
@@ -575,9 +641,8 @@ void Gameplay::handleEvents() {
     {
             // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
         int x = event.motion.x, y = event.motion.y;
-        if (x >= 870 && x <= 1220 && y >= 540 && y <= 590)
+        if (x >= 870 && x <= 1223 && y >= 523 && y <= 590)
         {
-            gButton[BUTTON_AUTO_RUN].HandleEvent(&event);
             if (!checksolve)
             {
                 checksolve = 1;
@@ -588,14 +653,23 @@ void Gameplay::handleEvents() {
             }
             break;
         }
+        else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
+        {
+            Random(Height);
+            step = 0;
+            if (timer.isStarted())
+                timer.stop();
+            break;
+        }
         if (!checksolve)
         {
-             cout << x << " " << y << endl;
+            cout << x << " " << y << endl;
              // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
              int P = checkPos({ x, y });
              if (P)
              {
                  Solve(Pos(P, a));
+                 Mix_PlayChannel(-1, gSlide, 0);
              }
              break;
             }
@@ -614,7 +688,7 @@ void Gameplay::SolveGame()
     AuToRun();
     update();
     render();
-    SDL_Delay(1000);
+    SDL_Delay(500);
     bool isQuit = false;
     SDL_Event e;
     for (int i = KQ.size() - 1; i >= 0 && !isQuit; i--)
@@ -664,16 +738,27 @@ void Gameplay::update() {
 void Gameplay::render() {
     // Hàm hiển thị hình ảnh các đối tượng của game ra màn hình ( các mảnh puzzle )
     SDL_RenderClear(gRenderer);
-    LTexture Background, GoalImage;
-    Background.loadFromFile("IMG//PlayGame.PNG");
-    GoalImage.loadFromFile("Data//anhYourName.png");
     GoalImage.Resize(234, 234);
     Background.render(0, 0);
     GoalImage.render(928, 52);
-    for (int i = 0; i < TOTAL_GAMEPLAY_BUTTONS; ++i)
-        gButton[i].HandleEvent(&event);
-    for (int j = 0; j < TOTAL_GAMEPLAY_BUTTONS; ++j)
-        gButton[j].render(GamePlayButton[j], gSpriteClips);
+
+    gButtonReload.HandleEvent(&event);
+    gButtonReload.render(ButtonReload, ButtonReloadRect);
+
+    gButtonBack.HandleEvent(&event);
+    gButtonBack.render(ButtonBack, ButtonBackRect);
+
+    gButtonAutoRun.HandleEvent(&event);
+    gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect);
+
+    StepTexture.loadFromRenderedText(to_string(step), { 0xFF, 0xFF, 0xFF });
+    StepTexture.render(660, 28);
+    
+    string time = millisecondsToTimeString(timer.getTicks());
+    timing.loadFromRenderedText(time, { 0xFF, 0xFF, 0xFF });
+    timing.render(92, 28);
+    ButtonMode.render(281, 9, &ButtonModeRect[n - 3]);
+
     for (int i = 1; i <= n * n - 1; i++)
     {
         Number[i]->Render();
@@ -685,10 +770,17 @@ void Gameplay::render() {
 void Gameplay::Play()
 {
     // Hàm để chơi game bằng bàn phím và chuột
+    if (Mix_PlayingMusic() == 0)
+    {
+        //Play the music
+        Mix_PlayMusic(gSoundTrack, -1);
+    }
     while (running()) {
         handleEvents();
         if (checksolve)
         {
+            if (!timer.isPaused())
+                timer.pause();
             SolveGame();
         }
         update();

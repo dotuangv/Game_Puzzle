@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include "CommonFunc.h"
 #include "LTexture.h"
+#include "LTimer.h"
 //#include "LButton.h"
 
 using namespace std;
@@ -21,7 +22,8 @@ private:
     vector<pair<int, int >> p;
     int Height;
     bool isRunning;
-    int cnt, check, zero, res, checksolve;
+    int cnt, check, zero, res, checksolve, step;
+    
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
@@ -31,6 +33,7 @@ public:
         check = 0;
         checksolve = 0;
         res = 1;
+        step = 0;
         isRunning = true;
     }
     void SetUpGame(int Height);

@@ -38,7 +38,11 @@ bool MainMenu::init() {
                 if (TTF_Init() == -1) {
                     success = false;
                 }
-
+                if (!(gFont = TTF_OpenFont("Font//Mooli-Regular.ttf", 24))) {
+                    std::cout << "Can't Initialize gFont TTF_Error: " << TTF_GetError() << std::endl;
+                    success = false;
+                }
+                
                 if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
                     success = false;
                 }
