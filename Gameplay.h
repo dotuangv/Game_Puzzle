@@ -22,8 +22,8 @@ private:
     vector<pair<int, int >> p;
     int Height;
     bool isRunning;
-    int cnt, check, zero, res, checksolve, step;
-    
+    int cnt, check, zero, res, checksolve, step, index;
+    bool checkmove = true;
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
@@ -46,7 +46,7 @@ public:
     bool CheckGoal(vector<vector<int>> a);
     int Heuristic(vector<vector<int>> a);
     void KhoiTao();
-    void AuToRun();
+    void AuToRun(bool CheckQuit);
     void Clear();
     void setA();
     void setGoal();
