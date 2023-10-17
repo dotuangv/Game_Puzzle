@@ -137,7 +137,7 @@ void MainMenu::run() {
                         startgame.run();
                         Gameplay* game;
                         game = new Gameplay();
-                        game->Run(FALSE);
+                        game->Run(TRUE);
                         break;
                     }
                     case BUTTON_INSTRUCTIONS:
