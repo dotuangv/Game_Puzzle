@@ -679,6 +679,13 @@ void Gameplay::handleEvents() {
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
             Random(Height);
+            KQ.clear();
+            CLOSE.clear();
+            while (!OPEN.empty()) {
+                OPEN.pop();
+            }
+            res = 1;
+            checkmove = true;
             step = 0;
             if (timer.isStarted())
                 timer.stop();
