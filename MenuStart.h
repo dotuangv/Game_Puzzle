@@ -2,6 +2,7 @@
 #ifndef  START_H_
 #define START_H_
 
+#include "CommonFunc.h"
 #include "LTexture.h"
 #include "LButton.h"
 
@@ -25,11 +26,12 @@ private:
     SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
     SDL_Rect gRect[START_BUTTON_TOTAL];
     LButton gButton[START_BUTTON_TOTAL];
+    SDL_Texture* LargeImage;
+    std::vector<LTexture> MenuImage;
 
 public:
     MenuStart();
     ~MenuStart();
-
     bool init();
     bool loadMedia();
     void close();
