@@ -294,15 +294,26 @@ void Gameplay::KhoiTao()
     }
 }
 
-void Gameplay::AuToRun()
+void Gameplay::AuToRun(bool CheckQuit)
 {
     cout << "HELLO\n";
+    display(a);
     //Khởi tạo trạng thái ban đầu.
     KhoiTao();
     // Curent là trạng thái đang xét hiện tại
     vector<vector<int>> Curent;
     int k = 1, l;
+    bool isQuit = false;
+    SDL_Event e;
     while (!OPEN.empty()) {
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT)
+            {
+                isQuit = true;
+                CheckQuit = true;
+                return;
+            }
+        }
         int g = OPEN.top().second.first;
         // lấy ra vị trí của trạng thái có chi phí thấp nhất trong OPEN
         l = OPEN.top().second.second;
@@ -371,7 +382,7 @@ void Gameplay::AuToRun()
         }
         k++;
         //cout << k << endl;
- //       display(Curent);
+        //display(Curent);
     }
     // Đẩy trạng thái đích vào KQ
     KQ.push_back(l);
@@ -380,6 +391,8 @@ void Gameplay::AuToRun()
         KQ.push_back(FATHER[l]);
         l = FATHER[l];
     }
+    cout << "KQ: " << KQ.size() << endl;
+    index = KQ.size();
 }
 
 void Gameplay::Clear()
@@ -540,8 +553,6 @@ void Gameplay::HandleAuto()
             {
                 //gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect, BUTTON_SPRITE_MOUSE_DOWN);
                 checksolve = 1;
-                if (timer.isStarted() && !timer.isPaused())
-                    timer.pause();
             }
             else
             {
@@ -587,6 +598,7 @@ void Gameplay::handleEvents() {
                             timer.start();
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    checkmove = true;
                 }
                 break;
             }
@@ -603,6 +615,7 @@ void Gameplay::handleEvents() {
                             timer.start();
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    checkmove = true;
                 }
                 break;
             }
@@ -619,6 +632,7 @@ void Gameplay::handleEvents() {
                             timer.start();
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    checkmove = true;
                 }
                 break;
             }
@@ -635,6 +649,7 @@ void Gameplay::handleEvents() {
                             timer.start();
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    checkmove = true;
                 }
                 break;
             }
@@ -652,6 +667,8 @@ void Gameplay::handleEvents() {
             if (!checksolve)
             {
                 checksolve = 1;
+                if (timer.isStarted() && !timer.isPaused())
+                    timer.pause();
             }
             else
             {
@@ -675,6 +692,7 @@ void Gameplay::handleEvents() {
              if (P)
              {
                  Solve(Pos(P, a));
+                 checkmove = true;
                  Mix_PlayChannel(-1, gSlide, 0);
              }
              break;
@@ -691,34 +709,44 @@ void Gameplay::handleEvents() {
 void Gameplay::SolveGame()
 {
     // Hàm giải game bằng AI
-    AuToRun();
+    if (checkmove)
+    {
+        KQ.clear();
+        CLOSE.clear();
+        while (!OPEN.empty()) {
+            OPEN.pop();
+        }
+        res = 1;
+        bool CheckQuit = false;
+        AuToRun(CheckQuit);
+        if (CheckQuit) return;
+
+    }
+    checkmove = false;
     update();
     render();
-    SDL_Delay(500);
+    SDL_Delay(250);
     bool isQuit = false;
     SDL_Event e;
-    for (int i = KQ.size() - 1; i >= 0 && !isQuit; i--)
+    while(index && !isQuit)
     {
         HandleAuto();
         if (!checksolve)
         {
-            KQ.clear();
-            CLOSE.clear();
-            while (!OPEN.empty()) {
-                OPEN.pop();
-            }
-            res = 0;
             return;
         }
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) isQuit = true;
         }
         // Tìm vị trị trong mảng KQ và cập nhật lại các ảnh của trạng thái đang xét đến
-        int x = FRINGE[KQ[i]].second;
+        int x = FRINGE[KQ[index - 1]].second;
+        cout << index << " " << x << endl;
+        //display(a);
         Solve(Pos(x, a));
         update();
         render();
-        SDL_Delay(500);
+        SDL_Delay(250);
+        index--;
     }
     isRunning = false;
     if (!isQuit) {
@@ -798,7 +826,12 @@ void Gameplay::Play()
                 SDL_Delay(500);
                 update();
                 render();
-                SDL_Delay(10000);
+                SDL_Event e;
+                bool IsQuit = false;
+                while (!IsQuit)
+                while (SDL_PollEvent(&e) != 0) {
+                      if (e.type == SDL_QUIT) IsQuit = true;
+                }
             }
         }
     }
