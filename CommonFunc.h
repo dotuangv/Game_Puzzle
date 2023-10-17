@@ -26,7 +26,6 @@ extern SDL_Window* gWindow;
 extern SDL_Renderer* gRenderer;
 extern SDL_Event* g_Event;
 extern TTF_Font* gFont;
-
 //Screen
 
 const int SCREEN_WIDTH = 1280;
@@ -40,12 +39,14 @@ const int COLOR_KEY_B = 180;
 const int FPS = 60;
 const int frameDelay = 1000 / FPS;
 
+const int TOTAL_IMAGE = 4;
 
 //Button constants
 const int BUTTON_WIDTH = 470;
 const int BUTTON_HEIGHT = 93;
 const int TOTAL_BUTTONS = 3;
 extern int n;
+extern int Order;
 
 enum LButtonSprite
 {

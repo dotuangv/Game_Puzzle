@@ -163,7 +163,6 @@ void MainMenu::run() {
         SDL_RenderClear(gRenderer);
 
         MTexture.render(0, 0);
-
         gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
         gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
         gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);

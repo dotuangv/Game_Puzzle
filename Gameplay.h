@@ -26,8 +26,13 @@ private:
     bool checkmove = true;
 public:
     // Constructor
-    Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))), b(vector<int>(6 + 2)),
-        posIMG(vector<pair<int, int>>(6 * 6 + 1)), FRINGE(100000, pair<vector<vector<int>>, int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)), FATHER(vector<int>(100000))
+    Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
+        a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
+        b(vector<int>(6 + 2)),
+        posIMG(vector<pair<int, int>>(6 * 6 + 1)),
+        FRINGE(100000, pair<vector<vector<int>>,
+        int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)),
+        FATHER(vector<int>(100000))
     {
         cnt = 0;
         check = 0;

@@ -1,11 +1,13 @@
 ﻿#include "MenuStart.h"
 
-MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)) {
+MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)), LargeImage(nullptr), MenuImage(vector<LTexture>(TOTAL_IMAGE)){
 }
 
 MenuStart::~MenuStart() {
     close();
 }
+
+std::vector<LTexture> TmpImages(TOTAL_IMAGE);
 
 bool MenuStart::loadMedia() {
     bool success = true;
@@ -38,23 +40,32 @@ bool MenuStart::loadMedia() {
         std::cout << "Can't not load Mode img : \n" << IMG_GetError();
         success = false;
     }
-    else
+    for (int i = 0; i < TOTAL_IMAGE; ++i)
     {
-         for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
-            gSpriteClips[i].x = 12;
-            gSpriteClips[i].y = 10 + 144 * i;
-            gSpriteClips[i].w = 144;
-            gSpriteClips[i].h = 140;
-        }
-        for (int i = 0; i < 4; ++i)
+        const std::string index = std::to_string(i);
+        if (!MenuImage[i].loadFromFile("Data/MenuImage/MenuImage" + index + ".png"))
         {
-            gButton[i].SetAllValue(568 + i * 181, 537, 144, 144);
+            std::cout << "Can't not load MenuImage img : \n" << IMG_GetError();
+            success = false;
         }
-        for (int i = 4; i < START_BUTTON_TOTAL; ++i)
-        {
-            gButton[i].SetAllValue(617 + (i - 4) * 461, 285, 144, 144);
-        }
+        else
+            TmpImages[i] = MenuImage[i];
     }
+    for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
+        gSpriteClips[i].x = 12;
+        gSpriteClips[i].y = 10 + 144 * i;
+        gSpriteClips[i].w = 144;
+        gSpriteClips[i].h = 140;
+    }
+    for (int i = 0; i < 4; ++i)
+    {
+        gButton[i].SetAllValue(568 + i * 181, 537, 144, 144);
+    }
+    for (int i = 4; i < START_BUTTON_TOTAL; ++i)
+    {
+        gButton[i].SetAllValue(617 + (i - 4) * 461, 285, 144, 144);
+    }
+    MenuImage[0].render(820, 256);
     return success;
 }
 
@@ -95,6 +106,7 @@ void MenuStart::run() {
                         {
                             //Ô 3 x 3
                             n = 3;
+                            
                             isRunning = false;
                             break;
                         }
@@ -122,13 +134,14 @@ void MenuStart::run() {
                         case BUTTON_TURN_LEFT:
                         {
                             //Chuyển ảnh trái
-                            
+                            if (Order == 0) Order = TOTAL_IMAGE - 1;
+                            else --Order;
                             break;
                         }
                         case BUTTON_TURN_RIGHT:
                         {
                             //Chuyển ảnh phải
-
+                            ++Order;
                             break;
                         }
                         default:
@@ -139,13 +152,13 @@ void MenuStart::run() {
             }
             SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_RenderClear(gRenderer);
+            TmpImages[Order % TOTAL_IMAGE].Resize(208, 208);
             HTexture.render(0, 0);
             for (int i = 0; i < START_BUTTON_TOTAL; ++i)
             {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
             }
-            //MenuStartButton[BUTTON_TURN_LEFT].render(500, 500);
-            //MenuStartButton[BUTTON_TURN_RIGHT].render(500, 500);
+            TmpImages[Order % TOTAL_IMAGE].render(820, 256);
 
             SDL_RenderPresent(gRenderer);
         }

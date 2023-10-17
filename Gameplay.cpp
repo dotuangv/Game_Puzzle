@@ -17,6 +17,8 @@ LTexture Background, GoalImage;
 
 bool Gameplay::LoadMedia() 
 {
+    std::string index = std::to_string(Order % TOTAL_IMAGE);
+    std::string imagePath = "Data//MenuImage//MenuImage" + index + ".png";
     bool success = true;
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
@@ -43,7 +45,7 @@ bool Gameplay::LoadMedia()
     {
         success = false;
     }
-    else if (!GoalImage.loadFromFile("Data//anhYourName.png"))
+    else if (!GoalImage.loadFromFile(imagePath))
     {
         success = false;
     }
@@ -503,10 +505,14 @@ void Gameplay::SetUpGame(int height)
     Random(height);
     setGoal();
     //Load ảnh lớn
-    SDL_Surface* imageSurface = IMG_Load("Data//anhYourName.png");
+    std::string index = std::to_string(Order % TOTAL_IMAGE);
+    std::string imagePath = "Data//MenuImage//MenuImage" + index + ".png";
+
+    SDL_Surface* imageSurface = IMG_Load(imagePath.c_str());
+
     SDL_Texture* largeTexture = SDL_CreateTextureFromSurface(gRenderer, imageSurface);
     SDL_FreeSurface(imageSurface);
-    // Tính kích thước của mỗi phần nhỏ
+    //Tính kích thước của mỗi phần nhỏ
     int smallWidth = 589 / n;
     vector<SDL_Texture*> CutPicture;
     CutPicture = CutTextureIntoPieces(largeTexture, n);
