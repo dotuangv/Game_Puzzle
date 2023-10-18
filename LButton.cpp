@@ -80,18 +80,13 @@ void LButton::HandleEvent(SDL_Event* e)
 	}
 }
 
-void LButton::render(LTexture& gButtonSpriteSheetTexture, SDL_Rect gSpriteClips[], LButtonSprite CurrentSprite)
+void LButton::render(LTexture& gButtonSpriteSheetTexture, SDL_Rect gSpriteClips[], bool isUsed)
 {
-	if (CurrentSprite != BUTTON_DEFAULT)
-	{
-		//Show current button sprite
+	if (isUsed)
 		gButtonSpriteSheetTexture.render(mPosition.x, mPosition.y, &gSpriteClips[BUTTON_SPRITE_MOUSE_DOWN]);
-	}
 	else
-	{
 		//Show current button sprite
 		gButtonSpriteSheetTexture.render(mPosition.x, mPosition.y, &gSpriteClips[mCurrentSprite]);
-	}
 }
 
 LButtonSprite LButton::getCurrentSprite()

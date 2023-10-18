@@ -42,9 +42,6 @@
     <ClCompile Include="LButton.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Choice.cpp">
-      <Filter>Resource Files\Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Help.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LButton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Choice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Help.h">

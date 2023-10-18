@@ -71,9 +71,13 @@ bool MenuStart::loadMedia() {
 
 void MenuStart::close() {
     HTexture.free(); // Giải phóng texture
-    for (int i = 0; i < START_BUTTON_TOTAL; ++i)
-    {
+    for (int i = 0; i < START_BUTTON_TOTAL; ++i) {
         MenuStartButton[i].free();
+    }
+
+    // Giải phóng tất cả các MenuImage đã được tạo
+    for (int i = 0; i < TOTAL_IMAGE; ++i) {
+        MenuImage[i].free();
     }
     // Không cần giải phóng renderer và window ở đây vì chúng được quản lý trong MainMenu.
 
