@@ -1,7 +1,8 @@
 ﻿#include "Gameplay.h"
 #include "LButton.h"
+#include "Main_Menu.h"
 
-LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture;
+LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
 
 SDL_Rect ButtonReloadRect[] = { {0, 0, 142, 142}, {0, 175, 142, 142}, {0,350 , 142, 142} };
@@ -300,7 +301,7 @@ void Gameplay::AuToRun(bool CheckQuit)
     display(a);
     //Khởi tạo trạng thái ban đầu.
     KhoiTao();
-    // Curent là trạng thái đang xét hiện tại
+    // Curent là trạng thái đang xét hiện t ại
     vector<vector<int>> Curent;
     int k = 1, l;
     bool isQuit = false;
@@ -397,6 +398,8 @@ void Gameplay::AuToRun(bool CheckQuit)
 
 void Gameplay::Clear()
 {
+    // Đặt isRunning thành false để kết thúc vòng lặp chính
+    isRunning = false;
     FATHER.clear();
     FRINGE.clear();
     CLOSE.clear();
@@ -691,6 +694,13 @@ void Gameplay::handleEvents() {
                 timer.stop();
             break;
         }
+        else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
+        {
+            checksolve = 0;
+            isUSE = true;
+            isQuit = true;
+            isRunning = false;
+        }
         if (!checksolve)
         {
             cout << x << " " << y << endl;
@@ -789,8 +799,10 @@ void Gameplay::render() {
     gButtonBack.HandleEvent(&event);
     gButtonBack.render(ButtonBack, ButtonBackRect);
 
-    gButtonAutoRun.HandleEvent(&event);
-    gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect);
+    if (checksolve == 1)
+        gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect, TRUE);
+    else 
+        gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect);
 
     StepTexture.loadFromRenderedText(to_string(step), { 0xFF, 0xFF, 0xFF });
     StepTexture.render(660, 28);
@@ -845,9 +857,23 @@ void Gameplay::Play()
 }
 
 void Gameplay::clean() {
-    SDL_DestroyWindow(gWindow);
-    SDL_DestroyRenderer(gRenderer);
-    SDL_Quit();
+    // Hàm giải phóng các đối tượng đã tạo
+    delete[] Number;
+    Number = NULL;
+    delete[] StartGame;
+    StartGame = NULL;
+    Mix_FreeMusic(gSoundTrack);
+    gSoundTrack = NULL;
+    Mix_FreeChunk(gSlide);
+    gSlide = NULL;
+    ButtonBack.free();
+    ButtonReload.free();
+    ButtonAutoRun.free();
+    ButtonMode.free();
+    Background.free();
+    GoalImage.free();
+    SDL_DestroyTexture(PlayerTex);
+    PlayerTex = NULL;
 }
 
 
@@ -859,7 +885,7 @@ void Gameplay::Run(bool isPlay) {
             Play();
         else
             SolveGame();
-        clean();
         Clear();
+        clean();
     }
 }

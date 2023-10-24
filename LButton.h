@@ -15,7 +15,7 @@ public:
 	void HandleEvent(SDL_Event* e);
 
 	//Shows button sprites
-	void render(LTexture& gButtonSpriteSheetTexture, SDL_Rect gSpriteClips[], LButtonSprite CurrentSprite = BUTTON_DEFAULT);
+	void render(LTexture& gButtonSpriteSheetTexture, SDL_Rect gSpriteClips[], bool isUsed = FALSE);
 
 	LButtonSprite getCurrentSprite();
 private:

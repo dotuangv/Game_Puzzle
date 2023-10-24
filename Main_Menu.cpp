@@ -1,14 +1,11 @@
 ﻿#include "Main_Menu.h"
 
 MainMenu::MainMenu() {
-    gWindow = NULL;
-    gRenderer = NULL;
-    gFont = NULL;
     mQuit = false;
 }
 
 MainMenu::~MainMenu() {
-    close();
+    //close();
 }
 
 bool MainMenu::init() {
@@ -19,7 +16,7 @@ bool MainMenu::init() {
     }
     else {
         gWindow = SDL_CreateWindow("Main Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if (gWindow == NULL) {
+        if (gWindow == nullptr) {
             success = false;
         }
         else {
@@ -49,7 +46,7 @@ bool MainMenu::init() {
             }
         }
     }
-
+    isInit = success;
     return success;
 }
 
@@ -91,28 +88,19 @@ bool MainMenu::loadMedia() {
 
 void MainMenu::close() {
     MTexture.free();
-
-    SDL_DestroyRenderer(gRenderer);
-    SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
-    gRenderer = NULL;
-
-    if (gFont != NULL) {
-        TTF_CloseFont(gFont);
-        gFont = NULL;
-    }
-
-    Mix_Quit();
-    IMG_Quit();
-    TTF_Quit();
-    SDL_Quit();
+    MTexture.free();
+    Start.free();
+    BHelp.free();
+    Exit.free();
 }
 
 void MainMenu::run() {
-    if (!init()) {
-        return;
+    if (!isInit)
+    {
+        if (!init()) {
+            return;
+        }
     }
-
     if (!loadMedia()) {
         return;
     }
@@ -138,6 +126,7 @@ void MainMenu::run() {
                         Gameplay* game;
                         game = new Gameplay();
                         game->Run(TRUE);
+                        if (isUSE == TRUE) mQuit = true;
                         break;
                     }
                     case BUTTON_INSTRUCTIONS:

@@ -7,6 +7,8 @@ MenuStart::~MenuStart() {
     close();
 }
 
+LTexture TypeMenu;
+
 std::vector<LTexture> TmpImages(TOTAL_IMAGE);
 
 bool MenuStart::loadMedia() {
@@ -40,6 +42,16 @@ bool MenuStart::loadMedia() {
         std::cout << "Can't not load Mode img : \n" << IMG_GetError();
         success = false;
     }
+    else if (!SolveMode.loadFromFile("IMG//Start_Menu//SolveMode.png"))
+    {
+        std::cout << "Can't not load Solve Mode IMG: " << IMG_GetError() << std::endl;
+        success = false;
+    }
+    else if (!TypeMenu.loadFromFile("IMG//Start_Menu//TypeMenu.png"))
+    {
+        std::cout << "Can't not load Type Menu IMG: " << IMG_GetError() << std::endl;
+        success = false;
+    }
     for (int i = 0; i < TOTAL_IMAGE; ++i)
     {
         const std::string index = std::to_string(i);
@@ -71,9 +83,13 @@ bool MenuStart::loadMedia() {
 
 void MenuStart::close() {
     HTexture.free(); // Giải phóng texture
-    for (int i = 0; i < START_BUTTON_TOTAL; ++i)
-    {
+    for (int i = 0; i < START_BUTTON_TOTAL; ++i) {
         MenuStartButton[i].free();
+    }
+
+    // Giải phóng tất cả các MenuImage đã được tạo
+    for (int i = 0; i < TOTAL_IMAGE; ++i) {
+        MenuImage[i].free();
     }
     // Không cần giải phóng renderer và window ở đây vì chúng được quản lý trong MainMenu.
 
@@ -159,9 +175,62 @@ void MenuStart::run() {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
             }
             TmpImages[Order % TOTAL_IMAGE].render(820, 256);
+            if (!isRunning)
+            {
+                SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
+                // Đặt màu vẽ là đen (0, 0, 0, 200) - mờ
+                SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 180);
+
+                // Tạo một SDL_Rect có kích thước như bạn muốn
+                SDL_Rect FillRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+
+                // Vẽ hình chữ nhật mờ lên Renderer
+                SDL_RenderFillRect(gRenderer, &FillRect);
+                // Đặt lại chế độ blend về mặc định
+                SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+                HandleEvent();
+            }
             SDL_RenderPresent(gRenderer);
         }
     }
     close();
+}
+
+void MenuStart::HandleEvent()
+{
+    TypeMenu.render(0, 0);
+    SDL_RenderPresent(gRenderer);
+    bool isQuitType = false;
+    SDL_Event e;
+    while (!isQuitType)
+    {
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                isQuitType = true;
+                break;
+            }
+            else
+            {
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    cout << e.motion.x << " " << e.motion.y << endl;
+                    if (e.motion.y >= 312 && e.motion.y <= 597)
+                    {
+                        if (e.motion.x >= 248 && e.motion.x <= 600)
+                        {
+                            Mode = 1;
+                        }
+                        else if (e.motion.x >= 712 && e.motion.x <= 1064)
+                        {
+                            Mode = 2;
+                        }
+                    }
+                }
+                if (Mode != 0) isQuitType = true;
+            }
+        }
+    }
 }

@@ -43,5 +43,6 @@ private:
     SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
 
     void renderText(const std::string& text, int x, int y);
+
 };
 #endif // MAINMENU_H

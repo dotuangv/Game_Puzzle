@@ -7,15 +7,34 @@ SDL_Renderer* gRenderer = NULL;
 
 TTF_Font* gFont = NULL;
 
-SDL_Texture* MainTexture;
-vector<SDL_Texture*> MainTextures;
 
+bool isUSE = true;
 int n = 0;
 int Order = 0;
+int Mode = 0;
+bool isInit = false;
 
 int main(int argc, char* argv[])
 {
-    MainMenu a;
-    a.run();
+    while (isUSE)
+    {
+        isUSE = false;
+        MainMenu a;
+        a.run();
+    }
+    SDL_DestroyRenderer(gRenderer);
+    SDL_DestroyWindow(gWindow);
+    gWindow = NULL;
+    gRenderer = NULL;
+
+    if (gFont != NULL) {
+        TTF_CloseFont(gFont);
+        gFont = NULL;
+    }
+
+    Mix_Quit();
+    IMG_Quit();
+    TTF_Quit();
+    SDL_Quit();
 	return 0;
 }
