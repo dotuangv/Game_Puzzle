@@ -2,7 +2,7 @@
 #include "LButton.h"
 #include "Main_Menu.h"
 
-LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture;
+LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
 
 SDL_Rect ButtonReloadRect[] = { {0, 0, 142, 142}, {0, 175, 142, 142}, {0,350 , 142, 142} };
@@ -301,7 +301,7 @@ void Gameplay::AuToRun(bool CheckQuit)
     display(a);
     //Khởi tạo trạng thái ban đầu.
     KhoiTao();
-    // Curent là trạng thái đang xét hiện tại
+    // Curent là trạng thái đang xét hiện t ại
     vector<vector<int>> Curent;
     int k = 1, l;
     bool isQuit = false;
