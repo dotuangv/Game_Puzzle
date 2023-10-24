@@ -41,6 +41,7 @@ public:
         step = 0;
         isRunning = true;
     }
+    void SetNguoc(int height);
     void SetUpGame(int Height);
     void CheckRand();
     void Random(int height);

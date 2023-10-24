@@ -501,11 +501,32 @@ std::vector<SDL_Texture*> CutTextureIntoPieces(SDL_Texture* texture, int n) {
 
     return textures;
 }
-
+void Gameplay::SetNguoc(int height)
+{
+    Height = height;
+    int tmp = n * n;
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= n; j++)
+        {
+            a[i][j] = tmp--;
+            if (i == 1 && j == 1) a[i][j] = 0;
+            //cin >> a[i][j];
+            //Tính tọa độ ảnh
+            posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 85 };
+            //Tìm hàng chứa ô trống
+            if (a[i][j] == 0) zero = i;
+        }
+    }
+    CheckRand();
+    if ((check + zero * (n % 2 + 1)) % 2 == 0) cout << "Duoc\n";
+    else cout << "Khong the giai\n";
+}
 void Gameplay::SetUpGame(int height)
 {
     setA();
-    Random(height);
+    //Random(height);
+    SetNguoc(height);
     setGoal();
     //Load ảnh lớn
     std::string index = std::to_string(Order % TOTAL_IMAGE);
@@ -842,6 +863,7 @@ void Gameplay::Play()
         {
             if (CheckGoal(a))
             {
+                checksolve = 0;
                 SDL_Delay(500);
                 update();
                 render();
@@ -887,5 +909,6 @@ void Gameplay::Run(bool isPlay) {
             SolveGame();
         Clear();
         clean();
+        isUSE = FALSE;
     }
 }
