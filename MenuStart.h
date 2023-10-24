@@ -10,6 +10,7 @@ class MenuStart {
 private:
     LTexture HTexture;
     vector<LTexture> MenuStartButton;
+    LTexture SolveMode;
     bool isRunning;
     
     enum StartButton
@@ -36,6 +37,7 @@ public:
     bool loadMedia();
     void close();
     void run();
+    void HandleEvent();
 };
 
 

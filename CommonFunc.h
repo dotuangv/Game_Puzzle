@@ -46,6 +46,7 @@ const int BUTTON_WIDTH = 470;
 const int BUTTON_HEIGHT = 93;
 const int TOTAL_BUTTONS = 3;
 extern int n;
+extern int Mode;
 extern int Order;
 extern bool isUSE;
 extern bool isInit;
