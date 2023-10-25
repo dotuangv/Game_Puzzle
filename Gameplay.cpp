@@ -525,8 +525,8 @@ void Gameplay::SetNguoc(int height)
 void Gameplay::SetUpGame(int height)
 {
     setA();
-    //Random(height);
-    SetNguoc(height);
+    if(!Mode) Random(height);
+    else SetNguoc(height);
     setGoal();
     //Load ảnh lớn
     std::string index = std::to_string(Order % TOTAL_IMAGE);
@@ -702,7 +702,8 @@ void Gameplay::handleEvents() {
         }
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
-            Random(Height);
+            if (!Mode) Random(Height);
+            else SetNguoc(Height);
             KQ.clear();
             CLOSE.clear();
             while (!OPEN.empty()) {

@@ -199,6 +199,7 @@ void MenuStart::run() {
 
 void MenuStart::HandleEvent()
 {
+    Mode = -1;
     TypeMenu.render(0, 0);
     SDL_RenderPresent(gRenderer);
     bool isQuitType = false;
@@ -221,15 +222,15 @@ void MenuStart::HandleEvent()
                     {
                         if (e.motion.x >= 248 && e.motion.x <= 600)
                         {
-                            Mode = 1;
+                            Mode = 0;
                         }
                         else if (e.motion.x >= 712 && e.motion.x <= 1064)
                         {
-                            Mode = 2;
+                            Mode = 1;
                         }
                     }
                 }
-                if (Mode != 0) isQuitType = true;
+                if (Mode != -1) isQuitType = true;
             }
         }
     }
