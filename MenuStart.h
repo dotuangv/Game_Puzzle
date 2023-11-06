@@ -12,6 +12,7 @@ private:
     vector<LTexture> MenuStartButton;
     LTexture SolveMode;
     bool isRunning;
+    bool isChooseMode;
     
     enum StartButton
     {
@@ -38,6 +39,7 @@ public:
     void close();
     void run();
     void HandleEvent();
+    bool getIsChooseMode() { return isChooseMode; }
 };
 
 

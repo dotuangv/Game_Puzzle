@@ -33,14 +33,14 @@ public:
         FRINGE(100000, pair<vector<vector<int>>,
         int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)),
         FATHER(vector<int>(100000))
-    {
-        cnt = 0;
-        check = 0;
-        checksolve = 0;
-        res = 1;
-        step = 0;
-        isRunning = true;
-    }
+        {
+            cnt = 0;
+            check = 0;
+            checksolve = 0;
+            res = 1;
+            step = 0;
+            isRunning = true;
+        }
     void SetNguoc(int height);
     void SetUpGame(int Height);
     void CheckRand();
@@ -73,7 +73,7 @@ public:
         return cnt;
     }
     int checkPos(pair<int, int> p);
-    void Run(bool isPlay);
+    void Run();
     static SDL_Event event;
     bool LoadMedia();
     void HandleAuto();

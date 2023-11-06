@@ -26,6 +26,7 @@ extern SDL_Window* gWindow;
 extern SDL_Renderer* gRenderer;
 extern SDL_Event* g_Event;
 extern TTF_Font* gFont;
+extern bool outGame;
 //Screen
 
 const int SCREEN_WIDTH = 1280;

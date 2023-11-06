@@ -1,6 +1,7 @@
 ﻿#include "MenuStart.h"
 
 MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)), LargeImage(nullptr), MenuImage(vector<LTexture>(TOTAL_IMAGE)){
+    isChooseMode = false;
 }
 
 MenuStart::~MenuStart() {
@@ -99,6 +100,7 @@ void MenuStart::close() {
 }
 
 void MenuStart::run() {
+    if (outGame) return;
     if (!loadMedia())
     {
         std::cout << "Fail to Load Media \n";
@@ -107,10 +109,11 @@ void MenuStart::run() {
     {
         SDL_Event e;
         isRunning = true;
-        while (isRunning) {
+        while (isRunning && !outGame) {
             while (SDL_PollEvent(&e) != 0) {
                 if (e.type == SDL_QUIT) {
                     isRunning = false;
+                    outGame = true;
                 }
 
                 for (int i = 0; i < START_BUTTON_TOTAL; ++i) {
@@ -175,7 +178,7 @@ void MenuStart::run() {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
             }
             TmpImages[Order % TOTAL_IMAGE].render(820, 256);
-            if (!isRunning)
+            if (!isRunning && isChooseMode == false && !outGame)
             {
                 SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -189,20 +192,20 @@ void MenuStart::run() {
                 SDL_RenderFillRect(gRenderer, &FillRect);
                 // Đặt lại chế độ blend về mặc định
                 SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
-                HandleEvent();
+                if (!outGame) HandleEvent();
             }
             SDL_RenderPresent(gRenderer);
         }
     }
-    close();
 }
 
 void MenuStart::HandleEvent()
 {
-    Mode = -1;
     TypeMenu.render(0, 0);
     SDL_RenderPresent(gRenderer);
     bool isQuitType = false;
+    isChooseMode = false;
+    Mode = 0;
     SDL_Event e;
     while (!isQuitType)
     {
@@ -211,6 +214,11 @@ void MenuStart::HandleEvent()
             if (e.type == SDL_QUIT)
             {
                 isQuitType = true;
+                outGame = true;
+                if (Mode == 0)
+                {
+                    isChooseMode = false;
+                }
                 break;
             }
             else
@@ -222,16 +230,19 @@ void MenuStart::HandleEvent()
                     {
                         if (e.motion.x >= 248 && e.motion.x <= 600)
                         {
-                            Mode = 0;
+                            isChooseMode = true;
+                            Mode = 1;
                         }
                         else if (e.motion.x >= 712 && e.motion.x <= 1064)
                         {
-                            Mode = 1;
+                            isChooseMode = true;
+                            Mode = 2;
                         }
                     }
                 }
-                if (Mode != -1) isQuitType = true;
+                if (Mode != 0 && isChooseMode == true) isQuitType = true;
             }
         }
     }
+    
 }
