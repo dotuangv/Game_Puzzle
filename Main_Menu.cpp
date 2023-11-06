@@ -95,6 +95,7 @@ void MainMenu::close() {
 }
 
 void MainMenu::run() {
+    if (outGame) return;
     if (!isInit)
     {
         if (!init()) {
@@ -104,58 +105,73 @@ void MainMenu::run() {
     if (!loadMedia()) {
         return;
     }
-
+    bool isBackButtonClick = false;
     SDL_Event e;
-
-    while (!mQuit) {
+    while (!mQuit && !outGame) {
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 mQuit = true;
+                outGame = true;
+                isBackButtonClick = false;
             }
 
             for (int i = 0; i < TOTAL_BUTTONS; ++i) {
                 gButtons[i].HandleEvent(&e);
                 // Xác định nút nào được nhấn và thực hiện tác vụ tương ứng
-                if (e.type == SDL_MOUSEBUTTONDOWN && gButtons[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
+                if (isBackButtonClick || e.type == SDL_MOUSEBUTTONDOWN && gButtons[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
+                    if (isBackButtonClick && !outGame) i = BUTTON_PLAY;
                     switch (i) {
                     case BUTTON_PLAY:
                     {
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
                         MenuStart startgame;
-                        startgame.run();
-                        Gameplay* game;
-                        game = new Gameplay();
-                        game->Run(TRUE);
-                        if (isUSE == TRUE) mQuit = true;
+                        do {
+                            startgame.run();
+                        } while (!startgame.getIsChooseMode() && !outGame);
+                        if (!outGame)
+                        {
+                            Gameplay* game;
+                            game = new Gameplay();
+                            game->Run();
+                            if (!outGame) isBackButtonClick = true;
+                        }
+                        else
+                        {
+                            mQuit = true;
+                        }
                         break;
                     }
                     case BUTTON_INSTRUCTIONS:
                     {
                         // Thực hiện hành động khi nút INSTRUCTIONS_BUTTON được nhấn
                         //Chuyển đến màn hình hướng dẫn
-                        Help gamehelp;
-                        gamehelp.run();
+                        if (!outGame)
+                        {
+                            Help gamehelp;
+                            gamehelp.run();
+                        }                      
                         break;
                     }
                     case BUTTON_EXIT:
                         // Thực hiện hành động khi nút EXIT_BUTTON được nhấn
                         mQuit = true; // Kết thúc game
-                        break;
-                    default:
+                        outGame = true;
                         break;
                     }
                 }
             }
         }
-
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
-
-        MTexture.render(0, 0);
-        gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
-        gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
-        gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
-        SDL_RenderPresent(gRenderer);
+        if (!outGame)
+        {
+            MTexture.render(0, 0);
+            gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
+            gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
+            gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
+            SDL_RenderPresent(gRenderer);
+        }
+        else break;
     }
 
     close();

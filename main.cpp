@@ -13,15 +13,13 @@ int n = 0;
 int Order = 0;
 int Mode = 0;
 bool isInit = false;
+bool outGame = false;
 
 int main(int argc, char* argv[])
 {
-    while (isUSE)
-    {
-        isUSE = false;
-        MainMenu a;
-        a.run();
-    }
+    isUSE = false;
+    MainMenu a;
+    a.run();
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
     gWindow = NULL;

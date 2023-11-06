@@ -525,8 +525,10 @@ void Gameplay::SetNguoc(int height)
 void Gameplay::SetUpGame(int height)
 {
     setA();
-    //Random(height);
-    SetNguoc(height);
+    if (Mode == 1)
+        Random(height);
+    else if (Mode == 2)
+        SetNguoc(height);
     setGoal();
     //Load ảnh lớn
     std::string index = std::to_string(Order % TOTAL_IMAGE);
@@ -599,6 +601,7 @@ void Gameplay::handleEvents() {
     case SDL_QUIT:
         isRunning = false;
         isQuit = true;
+        outGame = true;
         break;
     case SDL_KEYDOWN:
     {
@@ -700,6 +703,7 @@ void Gameplay::handleEvents() {
             }
             break;
         }
+        //Button Reload
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
             Random(Height);
@@ -715,6 +719,7 @@ void Gameplay::handleEvents() {
                 timer.stop();
             break;
         }
+        //Button Back
         else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
         {
             checksolve = 0;
@@ -853,6 +858,7 @@ void Gameplay::Play()
         handleEvents();
         if (checksolve)
         {
+            //Nếu thời gian đang chạy, dừng thời gian
             if (!timer.isPaused())
                 timer.pause();
             SolveGame();
@@ -871,7 +877,12 @@ void Gameplay::Play()
                 bool IsQuit = false;
                 while (!IsQuit)
                 while (SDL_PollEvent(&e) != 0) {
-                      if (e.type == SDL_QUIT) IsQuit = true;
+                    if (e.type == SDL_QUIT)
+                    {
+                        IsQuit = true;
+                        isRunning = false;
+                        outGame = true;
+                    }
                 }
             }
         }
@@ -899,16 +910,12 @@ void Gameplay::clean() {
 }
 
 
-void Gameplay::Run(bool isPlay) {
+void Gameplay::Run() {
     if (LoadMedia())
     {
         SetUpGame(594);
-        if (isPlay)
-            Play();
-        else
-            SolveGame();
+        Play();
         Clear();
         clean();
-        isUSE = FALSE;
     }
 }
