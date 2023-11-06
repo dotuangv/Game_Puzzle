@@ -601,7 +601,6 @@ void Gameplay::handleEvents() {
     case SDL_QUIT:
         isRunning = false;
         isQuit = true;
-        outGame = true;
         break;
     case SDL_KEYDOWN:
     {
@@ -706,7 +705,8 @@ void Gameplay::handleEvents() {
         //Button Reload
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
-            Random(Height);
+            if (!Mode) Random(Height);
+            else SetNguoc(Height);
             KQ.clear();
             CLOSE.clear();
             while (!OPEN.empty()) {
