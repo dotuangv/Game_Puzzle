@@ -1,7 +1,12 @@
 ﻿#include "MenuStart.h"
 
+bool isBack = false;
+LTexture SButtonMode;
+SDL_Rect SButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
+
 MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)), LargeImage(nullptr), MenuImage(vector<LTexture>(TOTAL_IMAGE)){
     isChooseMode = false;
+    isOut = false;
 }
 
 MenuStart::~MenuStart() {
@@ -46,6 +51,10 @@ bool MenuStart::loadMedia() {
     else if (!SolveMode.loadFromFile("IMG//Start_Menu//SolveMode.png"))
     {
         std::cout << "Can't not load Solve Mode IMG: " << IMG_GetError() << std::endl;
+        success = false;
+    }
+    else if (!SButtonMode.loadFromFile("IMG//Mode.png"))
+    {
         success = false;
     }
     else if (!TypeMenu.loadFromFile("IMG//Start_Menu//TypeMenu.png"))
@@ -115,7 +124,16 @@ void MenuStart::run() {
                     isRunning = false;
                     outGame = true;
                 }
-
+                if (e.type == SDL_MOUSEBUTTONDOWN)
+                {
+                    cout << e.motion.x << " " << e.motion.y << endl;
+                    if (e.motion.x >= 1190 && e.motion.x <= 1274 && e.motion.y <= 79)
+                    {
+                        isRunning = false;
+                        isOut = true;
+                        return;
+                    }
+                }
                 for (int i = 0; i < START_BUTTON_TOTAL; ++i) {
                     gButton[i].HandleEvent(&e);
                     // Xác định nút nào được nhấn và thực hiện tác vụ tương ứng
@@ -125,7 +143,7 @@ void MenuStart::run() {
                         {
                             //Ô 3 x 3
                             n = 3;
-                            
+                            isBack = false;
                             isRunning = false;
                             break;
                         }
@@ -134,6 +152,7 @@ void MenuStart::run() {
                             //Ô 4 x 4
                             n = 4;
                             isRunning = false;
+                            isBack = false;
                             break;
                         }
                         case BUTTON_MODE_5:
@@ -141,6 +160,7 @@ void MenuStart::run() {
                             //Ô 5 x 5
                             n = 5;
                             isRunning = false;
+                            isBack = false;
                             break;
                         }
                         case BUTTON_MODE_6:
@@ -148,6 +168,7 @@ void MenuStart::run() {
                             //Ô 6 x 6
                             n = 6;
                             isRunning = false;
+                            isBack = false;
                             break;
                         }
                         case BUTTON_TURN_LEFT:
@@ -169,8 +190,8 @@ void MenuStart::run() {
                     }
                 }
             }
-            SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-            SDL_RenderClear(gRenderer);
+            /*SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+            SDL_RenderClear(gRenderer);*/
             TmpImages[Order % TOTAL_IMAGE].Resize(208, 208);
             HTexture.render(0, 0);
             for (int i = 0; i < START_BUTTON_TOTAL; ++i)
@@ -178,7 +199,7 @@ void MenuStart::run() {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
             }
             TmpImages[Order % TOTAL_IMAGE].render(820, 256);
-            if (!isRunning && isChooseMode == false && !outGame)
+            if (!isRunning && isChooseMode == false && !outGame && isBack == false)
             {
                 SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -202,11 +223,16 @@ void MenuStart::run() {
 void MenuStart::HandleEvent()
 {
     TypeMenu.render(0, 0);
+    SButtonMode.render(515, 73, &SButtonModeRect[n - 3]);
     SDL_RenderPresent(gRenderer);
     bool isQuitType = false;
     isChooseMode = false;
     Mode = 0;
     SDL_Event e;
+    /*1021 98
+    1022 206
+        964 155
+        1086 158*/
     while (!isQuitType)
     {
         while (SDL_PollEvent(&e))
@@ -238,6 +264,12 @@ void MenuStart::HandleEvent()
                             isChooseMode = true;
                             Mode = 2;
                         }
+                    }
+                    else if (e.motion.x >= 964 && e.motion.x <= 1086 && e.motion.y >= 98 && e.motion.y <= 206)
+                    {
+                        isQuitType = true;
+                        isBack = true;
+                        isRunning = true;
                     }
                 }
                 if (Mode != 0 && isChooseMode == true) isQuitType = true;

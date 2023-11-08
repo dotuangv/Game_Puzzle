@@ -13,6 +13,7 @@ private:
     LTexture SolveMode;
     bool isRunning;
     bool isChooseMode;
+    bool isOut;
     
     enum StartButton
     {
@@ -40,6 +41,7 @@ public:
     void run();
     void HandleEvent();
     bool getIsChooseMode() { return isChooseMode; }
+    bool getIsOut(){ return isOut;  }
 };
 
 
