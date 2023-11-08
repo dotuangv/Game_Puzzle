@@ -312,6 +312,7 @@ void Gameplay::AuToRun(bool CheckQuit)
             {
                 isQuit = true;
                 CheckQuit = true;
+                outGame = true;
                 return;
             }
         }
@@ -601,6 +602,7 @@ void Gameplay::handleEvents() {
     case SDL_QUIT:
         isRunning = false;
         isQuit = true;
+        outGame = true;
         break;
     case SDL_KEYDOWN:
     {
@@ -622,6 +624,10 @@ void Gameplay::handleEvents() {
                         ++step;
                         if (!timer.isStarted())
                             timer.start();
+                        else if (timer.isPaused())
+                        {
+                            timer.unpause();
+                        }
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
                     checkmove = true;
@@ -639,6 +645,10 @@ void Gameplay::handleEvents() {
                         ++step;
                         if (!timer.isStarted())
                             timer.start();
+                        else if (timer.isPaused())
+                        {
+                            timer.unpause();
+                        }
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
                     checkmove = true;
@@ -656,6 +666,10 @@ void Gameplay::handleEvents() {
                         ++step;
                         if (!timer.isStarted())
                             timer.start();
+                        else if (timer.isPaused())
+                        {
+                            timer.unpause();
+                        }
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
                     checkmove = true;
@@ -673,6 +687,10 @@ void Gameplay::handleEvents() {
                         ++step;
                         if (!timer.isStarted())
                             timer.start();
+                        else if (timer.isPaused())
+                        {
+                            timer.unpause();
+                        }
                         Mix_PlayChannel(-1, gSlide, 0);
                     }
                     checkmove = true;
@@ -734,9 +752,13 @@ void Gameplay::handleEvents() {
              int P = checkPos({ x, y });
              if (P)
              {
-                 Solve(Pos(P, a));
-                 checkmove = true;
-                 Mix_PlayChannel(-1, gSlide, 0);
+                Solve(Pos(P, a));
+                if (timer.isPaused())
+                {
+                     timer.unpause();
+                }
+                checkmove = true;
+                Mix_PlayChannel(-1, gSlide, 0);
              }
              break;
             }
@@ -746,7 +768,7 @@ void Gameplay::handleEvents() {
         break;
     }
     // Nếu trạng thái hiện tại là trạng thái đích thì kết thúc vòng lặp, đánh giấu trò chơi đã dừng
-    isRunning = !CheckGoal(a) && !isQuit;
+    isRunning = !CheckGoal(a) && !isQuit && !outGame;
 }
 
 void Gameplay::SolveGame()
@@ -771,7 +793,7 @@ void Gameplay::SolveGame()
     SDL_Delay(250);
     bool isQuit = false;
     SDL_Event e;
-    while(index && !isQuit)
+    while(index && !isQuit && !outGame)
     {
         HandleAuto();
         if (!checksolve)
@@ -779,7 +801,11 @@ void Gameplay::SolveGame()
             return;
         }
         while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) isQuit = true;
+            if (e.type == SDL_QUIT)
+            {
+                isQuit = true;
+                outGame = true;
+            }
         }
         // Tìm vị trị trong mảng KQ và cập nhật lại các ảnh của trạng thái đang xét đến
         int x = FRINGE[KQ[index - 1]].second;
@@ -797,7 +823,11 @@ void Gameplay::SolveGame()
         render();
         while (!isQuit)
             while (SDL_PollEvent(&e) != 0) {
-                if (e.type == SDL_QUIT) isQuit = true;
+                if (e.type == SDL_QUIT)
+                {
+                    isQuit = true;
+                    outGame = true;
+                }
             }
     }
 }
@@ -825,7 +855,7 @@ void Gameplay::render() {
     gButtonBack.HandleEvent(&event);
     gButtonBack.render(ButtonBack, ButtonBackRect);
 
-    if (checksolve == 1)
+    if (checksolve == 1 && !CheckGoal(a))
         gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect, TRUE);
     else 
         gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect);
@@ -854,8 +884,9 @@ void Gameplay::Play()
         //Play the music
         Mix_PlayMusic(gSoundTrack, -1);
     }
-    while (running()) {
+    while (running() && !outGame) {
         handleEvents();
+        if (outGame) break;
         if (checksolve)
         {
             //Nếu thời gian đang chạy, dừng thời gian
@@ -865,12 +896,11 @@ void Gameplay::Play()
         }
         update();
         render();
-        if (!running())
+        if (!running() && !outGame)
         {
             if (CheckGoal(a))
             {
                 checksolve = 0;
-                SDL_Delay(500);
                 update();
                 render();
                 SDL_Event e;
@@ -882,6 +912,7 @@ void Gameplay::Play()
                         IsQuit = true;
                         isRunning = false;
                         outGame = true;
+                        return;
                     }
                 }
             }
