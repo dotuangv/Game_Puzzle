@@ -123,17 +123,22 @@ void MainMenu::run() {
                     switch (i) {
                     case BUTTON_PLAY:
                     {
+                        isBackButtonClick = false;
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
                         MenuStart startgame;
                         do {
                             startgame.run();
-                        } while (!startgame.getIsChooseMode() && !outGame);
-                        if (!outGame)
+                        } while (!startgame.getIsChooseMode() && !outGame && !startgame.getIsOut());
+                        if (!outGame && !startgame.getIsOut())
                         {
                             Gameplay* game;
                             game = new Gameplay();
                             game->Run();
                             if (!outGame) isBackButtonClick = true;
+                        }
+                        else if (startgame.getIsOut())
+                        {
+                            break;
                         }
                         else
                         {

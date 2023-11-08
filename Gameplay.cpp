@@ -16,6 +16,8 @@ Mix_Music* gSoundTrack = NULL;
 
 LTexture Background, GoalImage;
 
+bool isPressBack = false;
+
 bool Gameplay::LoadMedia() 
 {
     std::string index = std::to_string(Order % TOTAL_IMAGE);
@@ -744,6 +746,7 @@ void Gameplay::handleEvents() {
             isUSE = true;
             isQuit = true;
             isRunning = false;
+            isPressBack = true;
         }
         if (!checksolve)
         {
@@ -817,19 +820,21 @@ void Gameplay::SolveGame()
         SDL_Delay(250);
         index--;
     }
-    isRunning = false;
-    if (!isQuit) {
-        update();
-        render();
+    //isRunning = false;
+    checksolve = false;
+    update();
+    render();
+    /*if (!isQuit) {
         while (!isQuit)
             while (SDL_PollEvent(&e) != 0) {
                 if (e.type == SDL_QUIT)
                 {
+                    isRunning = false;
                     isQuit = true;
                     outGame = true;
                 }
             }
-    }
+    }*/
 }
 
 
@@ -849,10 +854,12 @@ void Gameplay::render() {
     Background.render(0, 0);
     GoalImage.render(928, 52);
 
-    gButtonReload.HandleEvent(&event);
+    if (!checksolve)
+        gButtonReload.HandleEvent(&event);
     gButtonReload.render(ButtonReload, ButtonReloadRect);
 
-    gButtonBack.HandleEvent(&event);
+    if (!checksolve)
+        gButtonBack.HandleEvent(&event);
     gButtonBack.render(ButtonBack, ButtonBackRect);
 
     if (checksolve == 1 && !CheckGoal(a))
@@ -884,7 +891,7 @@ void Gameplay::Play()
         //Play the music
         Mix_PlayMusic(gSoundTrack, -1);
     }
-    while (running() && !outGame) {
+    while (running() && !outGame && !isPressBack) {
         handleEvents();
         if (outGame) break;
         if (checksolve)
@@ -894,9 +901,10 @@ void Gameplay::Play()
                 timer.pause();
             SolveGame();
         }
+        isRunning = true;
         update();
         render();
-        if (!running() && !outGame)
+        /*if (!running() && !outGame)
         {
             if (CheckGoal(a))
             {
@@ -916,8 +924,10 @@ void Gameplay::Play()
                     }
                 }
             }
-        }
+        }*/
     }
+    isPressBack = false;
+    cout << "End roi nha !!! " << endl;
 }
 
 void Gameplay::clean() {
