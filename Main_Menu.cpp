@@ -147,16 +147,21 @@ void MainMenu::run() {
                         break;
                     }
                     case BUTTON_INSTRUCTIONS:
-                    {
                         // Thực hiện hành động khi nút INSTRUCTIONS_BUTTON được nhấn
                         //Chuyển đến màn hình hướng dẫn
                         if (!outGame)
                         {
                             Help gamehelp;
                             gamehelp.run();
-                        }                      
+                            if (gamehelp.getIsBackHelp())
+                            {
+                                outGame = false;
+                                SDL_Delay(100);
+                                while (SDL_PollEvent(&e));
+                                break;
+                            }
+                        }
                         break;
-                    }
                     case BUTTON_EXIT:
                         // Thực hiện hành động khi nút EXIT_BUTTON được nhấn
                         mQuit = true; // Kết thúc game
@@ -176,7 +181,6 @@ void MainMenu::run() {
             gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
             SDL_RenderPresent(gRenderer);
         }
-        else break;
     }
 
     close();

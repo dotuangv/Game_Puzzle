@@ -588,6 +588,18 @@ void Gameplay::HandleAuto()
                 checksolve = 0;
             }
         }
+        else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
+        {
+            checksolve = 0;
+            isUSE = true;
+            isQuit = true;
+            isRunning = false;
+            isPressBack = true;
+            if (timer.isStarted() || timer.isPaused())
+            {
+                timer.stop();
+            }
+        }
         break;
     }
     default:
@@ -708,7 +720,7 @@ void Gameplay::handleEvents() {
     {
             // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
         int x = event.motion.x, y = event.motion.y;
-        if (x >= 870 && x <= 1223 && y >= 523 && y <= 590)
+        if (x >= 870 && x <= 1223 && y >= 523 && y <= 590 && !CheckGoal(a))
         {
             if (!checksolve)
             {
@@ -747,6 +759,10 @@ void Gameplay::handleEvents() {
             isQuit = true;
             isRunning = false;
             isPressBack = true;
+            if (timer.isStarted() || timer.isPaused())
+            {
+                timer.stop();
+            }
         }
         if (!checksolve)
         {
@@ -879,7 +895,7 @@ void Gameplay::render() {
     {
         Number[i]->Render();
     }
-    if (!isRunning) Number[0]->Render();
+    if (CheckGoal(a)) Number[0]->Render();
     SDL_RenderPresent(gRenderer);
 }
 
