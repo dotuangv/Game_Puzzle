@@ -1,4 +1,10 @@
-#include "Help.h"
+﻿#include "Help.h"
+
+Help::Help()
+{
+	isRunning = true;
+	isBackHelp = false;
+}
 
 void Help::run()
 {
@@ -6,23 +12,36 @@ void Help::run()
 		std::cout << "Can't not load Help.png : " << IMG_GetError();
 	}
 	else {
-		isRunning = true;
 		SDL_Event e;
-		while (isRunning)
+		while (Help::isRunning)
 		{
 			while (SDL_PollEvent(&e) != 0)
 			{
 				if (e.type == SDL_QUIT)
 				{
-					isRunning = false;
+					Help::isRunning = false;
+					outGame = true;
+				}
+				if (e.type == SDL_MOUSEBUTTONDOWN)
+				{
+					if (e.motion.y >= 600)
+					{
+						Help::isRunning = false;
+						isBackHelp = true;
+						outGame = false;
+					}
 				}
 			}
 			SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear(gRenderer);
-
 			HTexture.Resize(SCREEN_WIDTH, SCREEN_HEIGHT);
 			HTexture.render(0, 0);
 			SDL_RenderPresent(gRenderer);
 		}
 	}
+}
+
+Help::~Help()
+{
+	HTexture.free();
 }

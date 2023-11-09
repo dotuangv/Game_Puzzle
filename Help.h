@@ -7,9 +7,12 @@
 class Help {
 	LTexture HTexture;
 	bool isRunning;
+	bool isBackHelp;
 public:
-	Help() : isRunning(false) {}
+	Help();
 	void run();
+	~Help();
+	bool getIsBackHelp() { return isBackHelp;  }
 };
 
 #endif // ! HELP_H
