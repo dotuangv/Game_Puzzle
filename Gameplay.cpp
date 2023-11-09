@@ -895,7 +895,7 @@ void Gameplay::render() {
     {
         Number[i]->Render();
     }
-    if (!isRunning) Number[0]->Render();
+    if (CheckGoal(a)) Number[0]->Render();
     SDL_RenderPresent(gRenderer);
 }
 
