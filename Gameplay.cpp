@@ -2,13 +2,14 @@
 #include "LButton.h"
 #include "Main_Menu.h"
 
-LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode;
+LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode, LoadingImage;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
 
 SDL_Rect ButtonReloadRect[] = { {0, 0, 142, 142}, {0, 175, 142, 142}, {0,350 , 142, 142} };
 SDL_Rect ButtonBackRect[] = { {0, 0, 156, 156}, {0, 180, 156, 156}, {0, 361, 156, 156} };
 SDL_Rect ButtonAutoRunRect[] = { {0, 0, 327, 65}, {0, 182, 327, 65}, {0, 356, 327, 65} };
 SDL_Rect ButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
+SDL_Rect LoadingImageRect[] = { {0, 0, 366, 211}, {0, 211, 366, 211}, {0, 422, 366, 211}, {0, 633, 366, 211} };
 LTimer timer;
 LTexture timing;
 Mix_Chunk* gSlide = NULL;
@@ -49,6 +50,10 @@ bool Gameplay::LoadMedia()
         success = false;
     }
     else if (!GoalImage.loadFromFile(imagePath))
+    {
+        success = false;
+    }
+    else if (!LoadingImage.loadFromFile("IMG//Loading.png"))
     {
         success = false;
     }
@@ -214,15 +219,23 @@ bool Gameplay::CheckTrung(vector<vector<int>> a)
     return false;
 }
 
+int farfromgoal = 0;
+
 bool Gameplay::CheckGoal(vector<vector<int>> a)
 {
     // Hàm kiểm tra xem trạng thái a có phải là trạng thái đích cần xét đến không
+    bool success = true;
+    farfromgoal = 0;
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= n; j++) {
-            if (a[i][j] != Goal[i][j]) return false;
+            if (a[i][j] != Goal[i][j])
+            {
+                ++farfromgoal;
+                success = false;
+            }
         }
     }
-    return true;
+    return success;
 }
 
 int Gameplay::Heuristic(vector<vector<int>> a)
@@ -299,6 +312,22 @@ void Gameplay::KhoiTao()
 
 void Gameplay::AuToRun(bool CheckQuit)
 {
+    farfromgoal = 0;
+    int status = 0;
+    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
+
+    // Đặt màu vẽ là đen (0, 0, 0, 200) - mờ
+    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 180);
+
+    // Tạo một SDL_Rect có kích thước như bạn muốn
+    SDL_Rect FillRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+
+    // Vẽ hình chữ nhật mờ lên Renderer
+    SDL_RenderFillRect(gRenderer, &FillRect);
+    // Đặt lại chế độ blend về mặc định
+    SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
+    LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+    SDL_RenderPresent(gRenderer);
     cout << "HELLO\n";
     display(a);
     //Khởi tạo trạng thái ban đầu.
@@ -307,6 +336,7 @@ void Gameplay::AuToRun(bool CheckQuit)
     vector<vector<int>> Curent;
     int k = 1, l;
     bool isQuit = false;
+    int present = 1e9;
     SDL_Event e;
     while (!OPEN.empty()) {
         while (SDL_PollEvent(&e) != 0) {
@@ -385,6 +415,16 @@ void Gameplay::AuToRun(bool CheckQuit)
             }
         }
         k++;
+        if (farfromgoal < present)
+        {
+            present = farfromgoal;
+        }
+        if (present <= n * n / 6 && status < 2)
+            status = 2;
+        else if (present <= n * n / 2 && status < 1)
+            status = 1;
+        LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+        SDL_RenderPresent(gRenderer);
         //cout << k << endl;
         //display(Curent);
     }
@@ -397,6 +437,10 @@ void Gameplay::AuToRun(bool CheckQuit)
     }
     cout << "KQ: " << KQ.size() << endl;
     index = KQ.size();
+    status = 3;
+    LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+    SDL_RenderPresent(gRenderer);
+    SDL_Delay(500);
 }
 
 void Gameplay::Clear()
@@ -737,7 +781,7 @@ void Gameplay::handleEvents() {
         //Button Reload
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
-            if (!Mode) Random(Height);
+            if (Mode == 1) Random(Height);
             else SetNguoc(Height);
             KQ.clear();
             CLOSE.clear();
@@ -851,6 +895,7 @@ void Gameplay::SolveGame()
                 }
             }
     }*/
+
 }
 
 
