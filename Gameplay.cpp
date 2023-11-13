@@ -2,14 +2,13 @@
 #include "LButton.h"
 #include "Main_Menu.h"
 
-LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode, LoadingImage;
+LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode, LoadingImage, FrameLoadingImage;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
 
 SDL_Rect ButtonReloadRect[] = { {0, 0, 142, 142}, {0, 175, 142, 142}, {0,350 , 142, 142} };
 SDL_Rect ButtonBackRect[] = { {0, 0, 156, 156}, {0, 180, 156, 156}, {0, 361, 156, 156} };
 SDL_Rect ButtonAutoRunRect[] = { {0, 0, 327, 65}, {0, 182, 327, 65}, {0, 356, 327, 65} };
 SDL_Rect ButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
-SDL_Rect LoadingImageRect[] = { {0, 0, 366, 211}, {0, 211, 366, 211}, {0, 422, 366, 211}, {0, 633, 366, 211} };
 LTimer timer;
 LTexture timing;
 Mix_Chunk* gSlide = NULL;
@@ -54,6 +53,10 @@ bool Gameplay::LoadMedia()
         success = false;
     }
     else if (!LoadingImage.loadFromFile("IMG//Loading.png"))
+    {
+        success = false;
+    }
+    else if (!FrameLoadingImage.loadFromFile("IMG//FrameLoadingImage.png"))
     {
         success = false;
     }
@@ -145,6 +148,8 @@ void Gameplay::display(vector<vector<int>> a)
     }
 }
 
+bool isMoved = false;
+
 void Gameplay::Solve(pair<int, int> p)
 {
 
@@ -161,6 +166,7 @@ void Gameplay::Solve(pair<int, int> p)
             if (!timer.isStarted())
                 timer.start();
         }
+        isMoved = true;
         return;
     }
     if (!y) {
@@ -172,6 +178,7 @@ void Gameplay::Solve(pair<int, int> p)
             if (!timer.isStarted())
                 timer.start();
         }
+        isMoved = true;
         return;
     }
     if (!z) {
@@ -183,6 +190,7 @@ void Gameplay::Solve(pair<int, int> p)
             if (!timer.isStarted())
                 timer.start();
         }
+        isMoved = true;
         return;
     }
     if (!t) {
@@ -194,6 +202,7 @@ void Gameplay::Solve(pair<int, int> p)
             if (!timer.isStarted())
                 timer.start();
         }
+        isMoved = true;
         return;
     }
 }
@@ -317,16 +326,17 @@ void Gameplay::AuToRun(bool CheckQuit)
     SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
     // Đặt màu vẽ là đen (0, 0, 0, 200) - mờ
-    SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 180);
+    SDL_SetRenderDrawColor(gRenderer, 0xDC, 0xBA, 0x79, 255 * 23 / 100);
 
     // Tạo một SDL_Rect có kích thước như bạn muốn
     SDL_Rect FillRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-
     // Vẽ hình chữ nhật mờ lên Renderer
     SDL_RenderFillRect(gRenderer, &FillRect);
     // Đặt lại chế độ blend về mặc định
     SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_NONE);
-    LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+    FrameLoadingImage.render(292, 119);
+    SDL_Rect LoadingImageRect = { 0, 0, 454, 132 };
+    LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
     SDL_RenderPresent(gRenderer);
     cout << "HELLO\n";
     display(a);
@@ -419,11 +429,12 @@ void Gameplay::AuToRun(bool CheckQuit)
         {
             present = farfromgoal;
         }
-        if (present <= n * n / 6 && status < 2)
-            status = 2;
-        else if (present <= n * n / 2 && status < 1)
-            status = 1;
-        LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
+        FrameLoadingImage.render(292, 119);
+        status = 8 - present * 8 / (n * n);
+        cout <<farfromgoal<<" " << present << " " << status << endl;
+        LoadingImageRect = { 0, status * 140, 454, 132 };
+        LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
         SDL_RenderPresent(gRenderer);
         //cout << k << endl;
         //display(Curent);
@@ -437,8 +448,9 @@ void Gameplay::AuToRun(bool CheckQuit)
     }
     cout << "KQ: " << KQ.size() << endl;
     index = KQ.size();
-    status = 3;
-    LoadingImage.render((SCREEN_WIDTH - LoadingImageRect[status].w) / 2, (SCREEN_HEIGHT - LoadingImageRect[status].h) / 2, &LoadingImageRect[status]);
+    FrameLoadingImage.render(292, 119);
+    LoadingImageRect = { 0, 9 * 140, 454, 132 };
+    LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
     SDL_RenderPresent(gRenderer);
     SDL_Delay(500);
 }
@@ -605,52 +617,6 @@ void Gameplay::SetUpGame(int height)
     CutPicture.clear();
 }
 
-void Gameplay::HandleAuto()
-{
-    bool isQuit = false;
-    SDL_PollEvent(&event);
-    switch (event.type)
-    {
-    case SDL_QUIT:
-        isRunning = false;
-        isQuit = true;
-        break;
-
-    case SDL_MOUSEBUTTONDOWN:
-    {
-        // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
-        int x = event.motion.x, y = event.motion.y;
-        if (x >= 870 && x <= 1220 && y >= 540 && y <= 590)
-        {
-            if (!checksolve)
-            {
-                //gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect, BUTTON_SPRITE_MOUSE_DOWN);
-                checksolve = 1;
-            }
-            else
-            {
-                checksolve = 0;
-            }
-        }
-        else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
-        {
-            checksolve = 0;
-            isUSE = true;
-            isQuit = true;
-            isRunning = false;
-            isPressBack = true;
-            if (timer.isStarted() || timer.isPaused())
-            {
-                timer.stop();
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
 void Gameplay::handleEvents() {
     //Hàm xử lí sự kiện để chơi trò chơi
     bool isQuit = false;
@@ -686,8 +652,8 @@ void Gameplay::handleEvents() {
                         {
                             timer.unpause();
                         }
-                        Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    Mix_PlayChannel(-1, gSlide, 0);
                     checkmove = true;
                 }
                 break;
@@ -707,8 +673,8 @@ void Gameplay::handleEvents() {
                         {
                             timer.unpause();
                         }
-                        Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    Mix_PlayChannel(-1, gSlide, 0);
                     checkmove = true;
                 }
                 break;
@@ -728,8 +694,8 @@ void Gameplay::handleEvents() {
                         {
                             timer.unpause();
                         }
-                        Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    Mix_PlayChannel(-1, gSlide, 0);
                     checkmove = true;
                 }
                 break;
@@ -749,8 +715,8 @@ void Gameplay::handleEvents() {
                         {
                             timer.unpause();
                         }
-                        Mix_PlayChannel(-1, gSlide, 0);
                     }
+                    Mix_PlayChannel(-1, gSlide, 0);
                     checkmove = true;
                 }
                 break;
@@ -821,7 +787,11 @@ void Gameplay::handleEvents() {
                      timer.unpause();
                 }
                 checkmove = true;
-                Mix_PlayChannel(-1, gSlide, 0);
+                if (isMoved)
+                {
+                    Mix_PlayChannel(-1, gSlide, 0);
+                    isMoved = false;
+                }
              }
              break;
             }
@@ -858,43 +828,67 @@ void Gameplay::SolveGame()
     SDL_Event e;
     while(index && !isQuit && !outGame)
     {
-        HandleAuto();
-        if (!checksolve)
-        {
-            return;
-        }
+        //HandleAuto();
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT)
             {
                 isQuit = true;
                 outGame = true;
             }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                int x = e.motion.x, y = e.motion.y;
+                if (x >= 870 && x <= 1223 && y >= 523 && y <= 590 && !CheckGoal(a))
+                {
+                    if (!checksolve)
+                    {
+                        checksolve = 1;
+                        if (timer.isStarted() && !timer.isPaused())
+                            timer.pause();
+                    }
+                    else
+                    {
+                        checksolve = 0;
+                    }
+                    break;
+                }
+                //Button Back
+                else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
+                {
+                    checksolve = 0;
+                    isUSE = true;
+                    isQuit = true;
+                    isRunning = false;
+                    isPressBack = true;
+                    if (timer.isStarted() || timer.isPaused())
+                    {
+                        timer.stop();
+                    }
+                }
+            }
+        if (!checksolve)
+        {
+            return;
+        }
         }
         // Tìm vị trị trong mảng KQ và cập nhật lại các ảnh của trạng thái đang xét đến
         int x = FRINGE[KQ[index - 1]].second;
         cout << index << " " << x << endl;
         //display(a);
         Solve(Pos(x, a));
+        if (isMoved)
+        {
+            Mix_PlayChannel(-1, gSlide, 0);
+            isMoved = true;
+        }
         update();
         render();
         SDL_Delay(250);
         index--;
     }
-    //isRunning = false;
     checksolve = false;
     update();
     render();
-    /*if (!isQuit) {
-        while (!isQuit)
-            while (SDL_PollEvent(&e) != 0) {
-                if (e.type == SDL_QUIT)
-                {
-                    isRunning = false;
-                    isQuit = true;
-                    outGame = true;
-                }
-            }
-    }*/
 
 }
 
@@ -965,27 +959,6 @@ void Gameplay::Play()
         isRunning = true;
         update();
         render();
-        /*if (!running() && !outGame)
-        {
-            if (CheckGoal(a))
-            {
-                checksolve = 0;
-                update();
-                render();
-                SDL_Event e;
-                bool IsQuit = false;
-                while (!IsQuit)
-                while (SDL_PollEvent(&e) != 0) {
-                    if (e.type == SDL_QUIT)
-                    {
-                        IsQuit = true;
-                        isRunning = false;
-                        outGame = true;
-                        return;
-                    }
-                }
-            }
-        }*/
     }
     isPressBack = false;
     cout << "End roi nha !!! " << endl;
