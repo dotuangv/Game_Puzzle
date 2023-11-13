@@ -737,7 +737,7 @@ void Gameplay::handleEvents() {
         //Button Reload
         else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
         {
-            if (!Mode) Random(Height);
+            if (Mode == 1) Random(Height);
             else SetNguoc(Height);
             KQ.clear();
             CLOSE.clear();
