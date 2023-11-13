@@ -72,9 +72,6 @@ void LButton::HandleEvent(SDL_Event* e)
 				mCurrentSprite = BUTTON_SPRITE_MOUSE_DOWN;
 				break;
 
-			case SDL_MOUSEBUTTONUP:
-				mCurrentSprite = BUTTON_SPRITE_MOUSE_UP;
-				break;
 			}
 		}
 	}

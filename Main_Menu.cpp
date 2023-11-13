@@ -69,7 +69,7 @@ bool MainMenu::loadMedia() {
         MTexture.Resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
             gSpriteClips[i].x = 1;
-            gSpriteClips[i].y = 93 * i + 10;
+            gSpriteClips[i].y = 93 * i + 6;
             gSpriteClips[i].w = BUTTON_WIDTH;
             gSpriteClips[i].h = BUTTON_HEIGHT;
         }
