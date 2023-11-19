@@ -22,8 +22,10 @@ private:
     vector<pair<int, int >> p;
     int Height;
     bool isRunning;
-    int cnt, check, zero, res, checksolve, step, index;
+    int cnt, check, res, checksolve, step, index;
+    pair<int, int> Poszero;
     bool checkmove = true;
+    int farfromgoal = 0;
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
@@ -77,4 +79,5 @@ public:
     static SDL_Event event;
     bool LoadMedia();
     void HandleAuto();
+    void SolveMouse(pair<int, int> p);
 };

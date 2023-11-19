@@ -125,13 +125,13 @@ void Gameplay::Random(int height)
                 //Tính tọa độ ảnh
                 posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 85 };
                 //Tìm hàng chứa ô trống
-                if (a[i][j] == 0) zero = i;
+                if (a[i][j] == 0) Poszero = { i, j };
                 b.erase(b.begin() + tmp);
                 //cout << posIMG[a[i][j]].first << " " << posIMG[a[i][j]].second << endl;
             }
         }
         CheckRand();
-        if ((check + zero * (n % 2 + 1)) % 2 == 0) break;
+        if ((check + Poszero.first * (n % 2 + 1)) % 2 == 0) break;
     }
 }
 
@@ -160,6 +160,7 @@ void Gameplay::Solve(pair<int, int> p)
     if (!x) {
         swap(a[p.first - 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        Poszero = { p.first, p.second };
         if (!checksolve)
         {
             ++step;
@@ -172,6 +173,7 @@ void Gameplay::Solve(pair<int, int> p)
     if (!y) {
         swap(a[p.first][p.second - 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        Poszero = { p.first, p.second };
         if (!checksolve)
         {
             ++step;
@@ -184,6 +186,7 @@ void Gameplay::Solve(pair<int, int> p)
     if (!z) {
         swap(a[p.first + 1][p.second], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        Poszero = { p.first, p.second };
         if (!checksolve)
         {
             ++step;
@@ -196,6 +199,7 @@ void Gameplay::Solve(pair<int, int> p)
     if (!t) {
         swap(a[p.first][p.second + 1], a[p.first][p.second]);
         swap(posIMG[W], posIMG[0]);
+        Poszero = { p.first, p.second };
         if (!checksolve)
         {
             ++step;
@@ -228,23 +232,18 @@ bool Gameplay::CheckTrung(vector<vector<int>> a)
     return false;
 }
 
-int farfromgoal = 0;
-
 bool Gameplay::CheckGoal(vector<vector<int>> a)
 {
     // Hàm kiểm tra xem trạng thái a có phải là trạng thái đích cần xét đến không
-    bool success = true;
-    farfromgoal = 0;
     for (int i = 1; i <= n; i++) {
         for (int j = 1; j <= n; j++) {
             if (a[i][j] != Goal[i][j])
             {
-                ++farfromgoal;
-                success = false;
+                return false;
             }
         }
     }
-    return success;
+    return true;
 }
 
 int Gameplay::Heuristic(vector<vector<int>> a)
@@ -283,6 +282,7 @@ void Gameplay::KhoiTao()
         int h = Heuristic(tmp);
         // Thêm vào hàng đợi ưu tiên OPEN f ( = g + h), vị trí của mảng thêm vào (res), chi phí đi từ lúc đầu đến trạng thái hiện tại(g)
         OPEN.push({ g + h, {g, res} });
+        farfromgoal = max(g + h, farfromgoal);
         //Lưu cha của mảng thứ res là 0;
         FATHER[res] = 0;
         res++;
@@ -294,6 +294,7 @@ void Gameplay::KhoiTao()
         FRINGE[res].second = y;
         int h = Heuristic(tmp);
         OPEN.push({ g + h, {g, res} });
+        farfromgoal = max(g + h, farfromgoal);
         FATHER[res] = 0;
         res++;
     }
@@ -304,6 +305,7 @@ void Gameplay::KhoiTao()
         FRINGE[res].second = z;
         int h = Heuristic(tmp);
         OPEN.push({ g + h, {g, res} });
+        farfromgoal = max(g + h, farfromgoal);
         FATHER[res] = 0;
         res++;
     }
@@ -314,6 +316,7 @@ void Gameplay::KhoiTao()
         FRINGE[res].second = t;
         int h = Heuristic(tmp);
         OPEN.push({ g + h, {g, res} });
+        farfromgoal = max(g + h, farfromgoal);
         FATHER[res] = 0;
         res++;
     }
@@ -321,7 +324,6 @@ void Gameplay::KhoiTao()
 
 void Gameplay::AuToRun(bool CheckQuit)
 {
-    farfromgoal = 0;
     int status = 0;
     SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
 
@@ -361,6 +363,8 @@ void Gameplay::AuToRun(bool CheckQuit)
         int g = OPEN.top().second.first;
         // lấy ra vị trí của trạng thái có chi phí thấp nhất trong OPEN
         l = OPEN.top().second.second;
+        cout << "He: " << OPEN.top().first << endl;
+        present = min(present, OPEN.top().first);
         // Cho trạng thái hiện tại đang xét là trạng thái tối ưu (vị trí l đã tính)
         Curent = FRINGE[l].first;
         // Đẩy trạng thái hiện tại vào CLOSE ( xác nhận trạng thái này đã xét)
@@ -425,14 +429,10 @@ void Gameplay::AuToRun(bool CheckQuit)
             }
         }
         k++;
-        if (farfromgoal < present)
-        {
-            present = farfromgoal;
-        }
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0xFF);
         FrameLoadingImage.render(292, 119);
-        status = 8 - present * 8 / (n * n);
-        cout <<farfromgoal<<" " << present << " " << status << endl;
+        status = 9 - (-1 + sqrt(1 + present * 288 / farfromgoal))/2;
+        //cout << present << " " << (-1 + sqrt(1 + present * 288 / farfromgoal)) / 2 << " " << status << endl;
         LoadingImageRect = { 0, status * 140, 454, 132 };
         LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
         SDL_RenderPresent(gRenderer);
@@ -520,6 +520,67 @@ int Gameplay::checkPos(pair<int, int> p)
     return 0;
 }
 
+void Gameplay::SolveMouse(pair<int, int> p)
+{
+    if (p == Poszero) return;
+    if (p.first == Poszero.first)
+    {
+        int i = p.first;
+        if (p.second < Poszero.second)
+        {
+            for (int j = Poszero.second - 1; j >= p.second; j--)
+            {
+                swap(posIMG[a[i][j]], posIMG[0]);
+                swap(a[i][j], a[i][j + 1]);
+            }
+        }
+        else
+        {
+            for (int j = Poszero.second + 1; j <= p.second; j++)
+            {
+                swap(posIMG[a[i][j]], posIMG[0]);
+                swap(a[i][j], a[i][j - 1]);
+            }
+        }
+        Poszero = p;
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
+        isMoved = true;
+    }
+    else if (p.second == Poszero.second)
+    {
+        int j = p.second;
+        if (p.first < Poszero.first)
+        {
+            for (int i = Poszero.first - 1; i >= p.first; i--)
+            {
+                swap(posIMG[a[i][j]], posIMG[0]);
+                swap(a[i][j], a[i + 1][j]);
+            }
+        }
+        else
+        {
+            for (int i = Poszero.first + 1; i <= p.first; i++)
+            {
+                swap(posIMG[a[i][j]], posIMG[0]);
+                swap(a[i][j], a[i - 1][j]);
+            }
+        }
+        Poszero = p;
+        if (!checksolve)
+        {
+            ++step;
+            if (!timer.isStarted())
+                timer.start();
+        }
+        isMoved = true;
+    }
+}
+
 //Gameplay::~Game() {};
 
 GameObject** Number;
@@ -574,11 +635,11 @@ void Gameplay::SetNguoc(int height)
             //Tính tọa độ ảnh
             posIMG[a[i][j]] = { Height / n * (j - 1) + 89, Height / n * (i - 1) + 85 };
             //Tìm hàng chứa ô trống
-            if (a[i][j] == 0) zero = i;
+            if (a[i][j] == 0) Poszero = { i, j };
         }
     }
     CheckRand();
-    if ((check + zero * (n % 2 + 1)) % 2 == 0) cout << "Duoc\n";
+    if ((check + Poszero.first * (n % 2 + 1)) % 2 == 0) cout << "Duoc\n";
     else cout << "Khong the giai\n";
 }
 void Gameplay::SetUpGame(int height)
@@ -643,6 +704,7 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first + 1][pa.second], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    Poszero = { pa.first + 1, pa.second };
                     if (!checksolve)
                     {
                         ++step;
@@ -664,6 +726,7 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first - 1][pa.second], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    Poszero = { pa.first - 1, pa.second };
                     if (!checksolve)
                     {
                         ++step;
@@ -685,6 +748,7 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first][pa.second + 1], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    Poszero = { pa.first, pa.second + 1 };
                     if (!checksolve)
                     {
                         ++step;
@@ -706,6 +770,7 @@ void Gameplay::handleEvents() {
                 if (x != n * n) {
                     swap(a[pa.first][pa.second - 1], a[pa.first][pa.second]);
                     swap(posIMG[x], posIMG[0]);
+                    Poszero = { pa.first, pa.second - 1 };
                     if (!checksolve)
                     {
                         ++step;
@@ -781,7 +846,7 @@ void Gameplay::handleEvents() {
              int P = checkPos({ x, y });
              if (P)
              {
-                Solve(Pos(P, a));
+                SolveMouse(Pos(P, a));
                 if (timer.isPaused())
                 {
                      timer.unpause();
