@@ -1,5 +1,6 @@
 ﻿#include "Main_Menu.h"
 #include "Winner.h"
+#include "LeaderBoard.h"
 
 using namespace std;
 
@@ -42,7 +43,8 @@ int main(int argc, char* argv[])
 //{
 //	MainMenu b;
 //	b.init();
-//	Winner a(20, "24:25");
+//	LeaderBoard a;
 //	a.run();
 //	return 0;
 //}
+
