@@ -14,7 +14,7 @@ LTexture::~LTexture()
 	free();
 }
 
-bool LTexture::loadFromFile(std::string path)
+bool LTexture::loadFromFile(std::string path, bool isSetColorKey)
 {
 	//Get rid of preexisting texture
 	free();
@@ -31,7 +31,8 @@ bool LTexture::loadFromFile(std::string path)
 	else
 	{
 		//Color key image
-		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0xFF, 0xFF));
+		if (isSetColorKey)
+			SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0xFF, 0xFF, 0xFF));
 
 		//Create texture from surface pixels
 		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
@@ -56,11 +57,11 @@ bool LTexture::loadFromFile(std::string path)
 }
 
 #if defined(SDL_TTF_MAJOR_VERSION)
-bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor)
+bool LTexture::loadFromRenderedText(std::string textureText, SDL_Color textColor, int FontSize)
 {
 	//Get rid of preexisting texture
 	free();
-	gFont = TTF_OpenFont("Font//Mooli-Regular.ttf", 18);
+	gFont = TTF_OpenFont("Font//Bungee-Regular.ttf", FontSize);
 		//Render text surface
 		SDL_Surface* textSurface = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
 		if (textSurface == NULL)

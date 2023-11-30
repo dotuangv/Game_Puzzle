@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #ifndef CLASS_H_
 #define CLASS_H_
 
@@ -14,7 +14,7 @@ public:
 	~LTexture();
 
 	//Loads image at specified path
-	bool loadFromFile(std::string path);
+	bool loadFromFile(std::string path, bool isSetColorKey = true);
 
 	//Deallocates texture
 	void free();
@@ -35,7 +35,7 @@ public:
 
 #if defined(SDL_TTF_MAJOR_VERSION)
 	//Creates image from font string
-	bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
+	bool loadFromRenderedText(std::string textureText, SDL_Color textColor, int FontSize = 56);
 #endif
 
 	//Gets image dimensions

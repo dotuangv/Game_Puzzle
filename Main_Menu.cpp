@@ -1,4 +1,5 @@
 ﻿#include "Main_Menu.h"
+#include "GetPlayerName.h"
 
 MainMenu::MainMenu() {
     mQuit = false;
@@ -15,7 +16,7 @@ bool MainMenu::init() {
         success = false;
     }
     else {
-        gWindow = SDL_CreateWindow("Main Menu", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        gWindow = SDL_CreateWindow("SLIDING PUZZLE", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if (gWindow == nullptr) {
             success = false;
         }
@@ -35,7 +36,7 @@ bool MainMenu::init() {
                 if (TTF_Init() == -1) {
                     success = false;
                 }
-                if (!(gFont = TTF_OpenFont("Font//Mooli-Regular.ttf", 24))) {
+                if (!(gFont = TTF_OpenFont("Font//Snacko Trial.otf", 56))) {
                     std::cout << "Can't Initialize gFont TTF_Error: " << TTF_GetError() << std::endl;
                     success = false;
                 }
@@ -123,6 +124,12 @@ void MainMenu::run() {
                     switch (i) {
                     case BUTTON_PLAY:
                     {
+                        GetPlayerName GetPlayerName;
+                        if (!GetPlayerName.run())
+                        {
+                            cout << "Player Name is Empty " << endl;
+                            break;
+                        }
                         isBackButtonClick = false;
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
                         MenuStart startgame;
@@ -175,6 +182,7 @@ void MainMenu::run() {
         SDL_RenderClear(gRenderer);
         if (!outGame)
         {
+
             MTexture.render(0, 0);
             gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
             gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
