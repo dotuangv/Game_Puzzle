@@ -21,6 +21,7 @@
 #include <SDL_ttf.h>
 #include <sstream>
 #include <string>
+#include <fstream>
 
 extern SDL_Window* gWindow;
 extern SDL_Renderer* gRenderer;

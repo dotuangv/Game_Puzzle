@@ -1,4 +1,6 @@
 ﻿#include "Main_Menu.h"
+#include "Winner.h"
+#include "LeaderBoard.h"
 
 using namespace std;
 
@@ -36,3 +38,13 @@ int main(int argc, char* argv[])
     SDL_Quit();
 	return 0;
 }
+
+//int main(int argc, char* argv[])
+//{
+//	MainMenu b;
+//	b.init();
+//	LeaderBoard a;
+//	a.run();
+//	return 0;
+//}
+
