@@ -48,6 +48,9 @@
     <ClCompile Include="LTimer.cpp">
       <Filter>Resource Files\Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GetPlayerName.cpp">
+      <Filter>Resource Files\Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextureManager.h">
@@ -78,6 +81,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GetPlayerName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Winner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeaderBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

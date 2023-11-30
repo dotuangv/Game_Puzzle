@@ -1,6 +1,7 @@
 ﻿#include "Gameplay.h"
 #include "LButton.h"
 #include "Main_Menu.h"
+#include "Winner.h"
 
 LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode, LoadingImage, FrameLoadingImage;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
@@ -692,7 +693,7 @@ void Gameplay::handleEvents() {
     case SDL_KEYDOWN:
     {
         // Khi nhấn xuống phím bất kì thì ta sẽ tìm tọa độ vị trí ô trống
-        if (!checksolve)
+        if (!checksolve && !CheckGoal(a))
         {
             pair<int, int> pa = Pos(0, a);
             switch (event.key.keysym.sym)
@@ -839,7 +840,7 @@ void Gameplay::handleEvents() {
                 timer.stop();
             }
         }
-        if (!checksolve)
+        if (!checksolve && !CheckGoal(a))
         {
             cout << x << " " << y << endl;
              // Tính toán xem vị trí click đang nằm ở ô nào ( đưa về vị trí lúc đầu ta xét để dễ tính )
@@ -865,6 +866,7 @@ void Gameplay::handleEvents() {
     default:
         break;
     }
+    if (CheckGoal(a) && !timer.isPaused()) timer.pause();
     // Nếu trạng thái hiện tại là trạng thái đích thì kết thúc vòng lặp, đánh giấu trò chơi đã dừng
     isRunning = !CheckGoal(a) && !isQuit && !outGame;
 }
@@ -987,19 +989,24 @@ void Gameplay::render() {
     else 
         gButtonAutoRun.render(ButtonAutoRun, ButtonAutoRunRect);
 
-    StepTexture.loadFromRenderedText(to_string(step), { 0xFF, 0xFF, 0xFF });
+    StepTexture.loadFromRenderedText(to_string(step), { 0xFF, 0xFF, 0xFF }, 20);
     StepTexture.render(660, 28);
     
     string time = millisecondsToTimeString(timer.getTicks());
-    timing.loadFromRenderedText(time, { 0xFF, 0xFF, 0xFF });
+    timing.loadFromRenderedText(time, { 0xFF, 0xFF, 0xFF }, 20);
     timing.render(92, 28);
-    ButtonMode.render(281, 9, &ButtonModeRect[n - 3]);
+    ButtonMode.render(282, 6, &ButtonModeRect[n - 3]);
 
     for (int i = 1; i <= n * n - 1; i++)
     {
         Number[i]->Render();
     }
-    if (CheckGoal(a)) Number[0]->Render();
+    if (CheckGoal(a))
+    {
+        Number[0]->Render();
+        Winner W(step, time);
+        W.run();
+    }
     SDL_RenderPresent(gRenderer);
 }
 
@@ -1023,7 +1030,7 @@ void Gameplay::Play()
         }
         isRunning = true;
         update();
-        render();
+        render(); 
     }
     isPressBack = false;
     cout << "End roi nha !!! " << endl;
