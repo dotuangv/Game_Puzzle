@@ -18,6 +18,8 @@ Mix_Music* gSoundTrack = NULL;
 LTexture Background, GoalImage;
 
 bool isPressBack = false;
+bool WinnerScreenOff = false;
+bool isPressReload = false;
 
 bool Gameplay::LoadMedia() 
 {
@@ -679,6 +681,24 @@ void Gameplay::SetUpGame(int height)
     CutPicture.clear();
 }
 
+void Gameplay::PressReload()
+{
+    if (Mode == 1) Random(Height);
+    else SetNguoc(Height);
+    KQ.clear();
+    CLOSE.clear();
+    while (!OPEN.empty()) {
+        OPEN.pop();
+    }
+    res = 1;
+    checkmove = true;
+    step = 0;
+    if (timer.isStarted())
+        timer.stop();
+    isPressReload = false;
+    WinnerScreenOff = false;
+}
+
 void Gameplay::handleEvents() {
     //Hàm xử lí sự kiện để chơi trò chơi
     bool isQuit = false;
@@ -811,20 +831,9 @@ void Gameplay::handleEvents() {
             break;
         }
         //Button Reload
-        else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
+        else if(((x >= 987 && x <= 1809 && y >= 371 && y <= 447 ) || isPressReload) && checksolve == 0)
         {
-            if (Mode == 1) Random(Height);
-            else SetNguoc(Height);
-            KQ.clear();
-            CLOSE.clear();
-            while (!OPEN.empty()) {
-                OPEN.pop();
-            }
-            res = 1;
-            checkmove = true;
-            step = 0;
-            if (timer.isStarted())
-                timer.stop();
+            PressReload();
             break;
         }
         //Button Back
@@ -959,8 +968,6 @@ void Gameplay::SolveGame()
 
 }
 
-
-
 void Gameplay::update() {
     // Hàm cập nhật lại các tọa độ của các đối tượng của game ( các mảnh puzzle )
     for (int i = 0; i <= n * n - 1; i++)
@@ -1001,12 +1008,23 @@ void Gameplay::render() {
     {
         Number[i]->Render();
     }
-    if (CheckGoal(a))
+    if (CheckGoal(a) && !WinnerScreenOff)
     {
         Number[0]->Render();
         Winner W(step, time);
         W.run();
+        isPressBack = W.GetIsPressBack();
+        isPressReload = W.GetIsPressReload();
+        cout << isPressReload;
+        if (isPressReload)
+        {
+            PressReload();
+            isPressReload = false;
+        }
+        else WinnerScreenOff = true;
     }
+    if (isPressReload)
+        render();
     SDL_RenderPresent(gRenderer);
 }
 
