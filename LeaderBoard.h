@@ -14,6 +14,21 @@ struct Record {
 	}
 };
 
+
+bool Compare(Record R1, Record R2)
+{
+	int check = strcmp(R1.time.c_str(), R2.time.c_str());
+	if (check < 0)
+	{
+		return true;
+	}
+	else if (check == 0)
+	{
+		return (R1.step < R2.step) ? true : false;
+	}
+	return false;
+}
+
 class LeaderBoard {
 private:
 	vector<Record> LeaderBoardRecord;

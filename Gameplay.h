@@ -80,4 +80,6 @@ public:
     bool LoadMedia();
     void HandleAuto();
     void SolveMouse(pair<int, int> p);
+    void Infile();
+    void Outfile();
 };

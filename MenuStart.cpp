@@ -1,5 +1,5 @@
 ﻿#include "MenuStart.h"
-
+#include "Gameplay.h"
 bool isBack = false;
 LTexture SButtonMode;
 SDL_Rect SButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
@@ -143,6 +143,7 @@ void MenuStart::run() {
                         {
                             //Ô 3 x 3
                             n = 3;
+                            
                             isBack = false;
                             isRunning = false;
                             break;
@@ -151,6 +152,7 @@ void MenuStart::run() {
                         {
                             //Ô 4 x 4
                             n = 4;
+                            
                             isRunning = false;
                             isBack = false;
                             break;
@@ -159,6 +161,7 @@ void MenuStart::run() {
                         {
                             //Ô 5 x 5
                             n = 5;
+                           
                             isRunning = false;
                             isBack = false;
                             break;
@@ -167,6 +170,7 @@ void MenuStart::run() {
                         {
                             //Ô 6 x 6
                             n = 6;
+                           
                             isRunning = false;
                             isBack = false;
                             break;

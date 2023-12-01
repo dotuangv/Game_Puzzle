@@ -582,6 +582,61 @@ void Gameplay::SolveMouse(pair<int, int> p)
     }
 }
 
+void Gameplay::Infile()
+{
+    string tenfile = "ContinueGame/puzzle";
+    string N = to_string(n);
+    tenfile += N + ".txt";
+    ifstream inFile(tenfile);
+    if (inFile.is_open())
+    {
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                inFile >> a[i][j];
+            }
+        }
+
+        for (int i = 0; i < n * n; i++)
+        {
+            inFile >> posIMG[i].first >> posIMG[i].second;
+        }
+
+        inFile >> Poszero.first >> Poszero.second;
+
+        inFile.close();
+    }
+}
+
+void Gameplay::Outfile()
+{
+    string tenfile = "ContinueGame/puzzle";
+    string N = to_string(n);
+    tenfile += N + ".txt";
+    ofstream outFile(tenfile);
+    if (outFile.is_open())
+    {
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                outFile << a[i][j] << " ";
+            }
+            outFile << endl;
+        }
+
+        for (int i = 0; i < n * n; i++)
+        {
+            outFile << posIMG[i].first << " " << posIMG[i].second << endl;
+        }
+
+        outFile << Poszero.first << " " << Poszero.second;
+
+        outFile.close();
+    }
+}
+
 //Gameplay::~Game() {};
 
 GameObject** Number;
@@ -650,6 +705,12 @@ void Gameplay::SetUpGame(int height)
         Random(height);
     else if (Mode == 2)
         SetNguoc(height);
+    //Height = height;
+    //Infile();
+   /* cout << "Hello\n";
+    cout << Poszero.first << " " << Poszero.second << endl;
+    display(a);
+    for (int i = 0; i < n * n; i++) cout << posIMG[i].first << " " << posIMG[i].second << endl;*/
     setGoal();
     //Load ảnh lớn
     std::string index = std::to_string(Order % TOTAL_IMAGE);
@@ -830,11 +891,13 @@ void Gameplay::handleEvents() {
         //Button Back
         else if (x >= 1207 && x <= 1278 && y >= 0 && y <= 71)
         {
+            //cout << "O day\n";
             checksolve = 0;
             isUSE = true;
             isQuit = true;
             isRunning = false;
             isPressBack = true;
+            Outfile();
             if (timer.isStarted() || timer.isPaused())
             {
                 timer.stop();
