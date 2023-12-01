@@ -43,6 +43,7 @@ public:
             step = 0;
             isRunning = true;
         }
+    void PressReload();
     void SetNguoc(int height);
     void SetUpGame(int Height);
     void CheckRand();
