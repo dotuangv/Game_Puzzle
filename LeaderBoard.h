@@ -93,12 +93,6 @@ public:
 
 	bool LoadFromFile() {
 		bool success = true;
-		if (!LBTexture.loadFromFile("IMG//LeaderBoard//Leader Board - Main.png", false))
-		{
-			cout << "Can't load the LBTexture!! SDL ERROR: " << SDL_GetError() << " IMG ERROR: " << IMG_GetError() << endl;
-			success = false;
-		}
-
 		const string filename = "LeaderBoard-Record//HighScore.txt";
 
 		std::ifstream file(filename);
