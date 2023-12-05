@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef COMMON_FUNCTION_H_
 
 #define COMMON_FUNCTION_H_
@@ -23,11 +23,21 @@
 #include <string>
 #include <fstream>
 
+//Window chung
 extern SDL_Window* gWindow;
+
+//Renderer chung
 extern SDL_Renderer* gRenderer;
+
+//Sự kiện chung
 extern SDL_Event* g_Event;
+
+//Font
 extern TTF_Font* gFont;
+
+//Kiểm tra thoát game
 extern bool outGame;
+
 //Screen
 
 const int SCREEN_WIDTH = 1280;
@@ -52,6 +62,8 @@ extern int Mode;
 extern int Order;
 extern bool isUSE;
 extern bool isInit;
+
+//Trạng thái của button
 enum LButtonSprite
 {
     BUTTON_DEFAULT = -1,

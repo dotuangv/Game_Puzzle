@@ -55,7 +55,7 @@ public:
     bool CheckGoal(vector<vector<int>> a);
     int Heuristic(vector<vector<int>> a);
     void KhoiTao();
-    void AuToRun(bool CheckQuit);
+    void AuToRun(bool &CheckQuit);
     void Clear();
     void setA();
     void setGoal();

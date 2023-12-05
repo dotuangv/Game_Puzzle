@@ -28,11 +28,13 @@ private:
 	LTexture LBTexture;
 	SDL_Renderer* LBRenderer;
 	int Current;
+	int MAX = 10;
 	vector<std::vector<LTexture>> StepTexture;
 	vector<std::vector<LTexture>> NameTexture;
 	vector<std::vector<LTexture>> TimeTexture;
 	vector<std::vector<LTexture>> RankTexture;
 	bool Quit;
+	SDL_Event e;
 public:
 	LeaderBoard() {
 		Current = 0;
@@ -179,10 +181,35 @@ public:
 		LBTexture.render(0, 0);
 		for (int i = 0; i < 5; ++i)
 		{
-			RankTexture[mode][i].render(186, 272 + 78 * (i + Current));
-			StepTexture[mode][i].render(989, 272 + 78 * (i + Current));
-			NameTexture[mode][i].render(325, 272 + 78 * (i + Current));
-			TimeTexture[mode][i].render(782, 272 + 78 * (i + Current));
+			RankTexture[mode][Current + i].render(186, 272 + 78 * i);
+			StepTexture[mode][Current + i].render(989, 272 + 78 * i);
+			NameTexture[mode][Current + i].render(325, 272 + 78 * i);
+			TimeTexture[mode][Current + i].render(782, 272 + 78 * i);
+		}
+	}
+	void HandleEvent()
+	{
+		while (SDL_PollEvent(&e))
+		{
+			if (e.type == SDL_QUIT)
+			{
+				Quit = true;
+			}
+			else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+			{
+				Quit = true;
+				outGame = true;
+			}
+			if (e.wheel.y < 0)
+			{
+				if (Current + 1 < MAX - 4)
+					++Current;
+			}
+			else if (e.wheel.y > 0)
+			{
+				if (Current - 1 >= 0)
+					--Current;
+			}
 		}
 	}
 
@@ -200,6 +227,7 @@ public:
 		while (!Quit)
 		{
 			LBTexture.render(0, 0);
+			HandleEvent();
 			render(Mode3x3);
 			SDL_RenderPresent(gRenderer);
 		}
