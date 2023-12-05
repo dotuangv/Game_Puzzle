@@ -20,7 +20,7 @@ std::vector<LTexture> TmpImages(TOTAL_IMAGE);
 bool MenuStart::loadMedia() {
     bool success = true;
 
-    if (!HTexture.loadFromFile("IMG//Start_Menu//ModeAndImage.PNG")) {
+    if (!HTexture.loadFromFile("IMG//Start_Menu//ModeAndImage.PNG", false)) {
         std::cout << "Can't not load ModeAndImage.PNG : " << IMG_GetError();
         success = false;
     }
@@ -57,7 +57,7 @@ bool MenuStart::loadMedia() {
     {
         success = false;
     }
-    else if (!TypeMenu.loadFromFile("IMG//Start_Menu//TypeMenu.png"))
+    else if (!TypeMenu.loadFromFile("IMG//Start_Menu//TypeMenu.png", false))
     {
         std::cout << "Can't not load Type Menu IMG: " << IMG_GetError() << std::endl;
         success = false;
@@ -124,6 +124,11 @@ void MenuStart::run() {
                     isRunning = false;
                     outGame = true;
                 }
+                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    isRunning = true;
+                    outGame = true;
+                }
                 if (e.type == SDL_MOUSEBUTTONDOWN)
                 {
                     cout << e.motion.x << " " << e.motion.y << endl;
@@ -142,8 +147,7 @@ void MenuStart::run() {
                         case BUTTON_MODE_3:
                         {
                             //Ô 3 x 3
-                            n = 3;
-                            
+                            n = 3;                            
                             isBack = false;
                             isRunning = false;
                             break;
@@ -151,8 +155,7 @@ void MenuStart::run() {
                         case BUTTON_MODE_4:
                         {
                             //Ô 4 x 4
-                            n = 4;
-                            
+                            n = 4;                          
                             isRunning = false;
                             isBack = false;
                             break;
@@ -160,8 +163,7 @@ void MenuStart::run() {
                         case BUTTON_MODE_5:
                         {
                             //Ô 5 x 5
-                            n = 5;
-                           
+                            n = 5;                           
                             isRunning = false;
                             isBack = false;
                             break;
@@ -169,8 +171,7 @@ void MenuStart::run() {
                         case BUTTON_MODE_6:
                         {
                             //Ô 6 x 6
-                            n = 6;
-                           
+                            n = 6;                           
                             isRunning = false;
                             isBack = false;
                             break;
@@ -178,7 +179,8 @@ void MenuStart::run() {
                         case BUTTON_TURN_LEFT:
                         {
                             //Chuyển ảnh trái
-                            if (Order == 0) Order = TOTAL_IMAGE - 1;
+                            if (Order == 0) 
+                                Order = TOTAL_IMAGE - 1;
                             else --Order;
                             break;
                         }

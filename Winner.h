@@ -74,6 +74,11 @@ public:
 				outGame = true;
 				break;
 			}
+			else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+			{
+				Quit = true;
+				outGame = true;
+			}
 			else
 			{
 				if (e.type == SDL_MOUSEBUTTONDOWN)
