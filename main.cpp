@@ -9,7 +9,6 @@ SDL_Renderer* gRenderer = NULL;
 
 TTF_Font* gFont = NULL;
 
-
 bool isUSE = true;
 int n = 0;
 int Order = 0;

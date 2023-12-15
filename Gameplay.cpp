@@ -18,6 +18,8 @@ Mix_Music* gSoundTrack = NULL;
 LTexture Background, GoalImage;
 
 bool isPressBack = false;
+bool WinnerScreenOff = false;
+bool isPressReload = false;
 
 bool Gameplay::LoadMedia() 
 {
@@ -323,7 +325,7 @@ void Gameplay::KhoiTao()
     }
 }
 
-void Gameplay::AuToRun(bool CheckQuit)
+void Gameplay::AuToRun(bool &CheckQuit)
 {
     int status = 0;
     SDL_SetRenderDrawBlendMode(gRenderer, SDL_BLENDMODE_BLEND);
@@ -360,6 +362,28 @@ void Gameplay::AuToRun(bool CheckQuit)
                 outGame = true;
                 return;
             }
+            else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+            {
+                isQuit = true;
+                CheckQuit = true;
+                outGame = true;
+                return;
+            }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (e.motion.x >= 543 && e.motion.y >= 468 && e.motion.x <= 543 + 194 && e.motion.y <= 468 + 66)
+                {
+                    checksolve = 0;
+                    CheckQuit = true;
+                    //KQ.clear();
+                    //CLOSE.clear();
+                    //while (!OPEN.empty()) {
+                    //    OPEN.pop();
+                    //}
+                    //res = 1;
+                    return;
+                }
+            } 
         }
         int g = OPEN.top().second.first;
         // lấy ra vị trí của trạng thái có chi phí thấp nhất trong OPEN
@@ -440,20 +464,20 @@ void Gameplay::AuToRun(bool CheckQuit)
         //cout << k << endl;
         //display(Curent);
     }
-    // Đẩy trạng thái đích vào KQ
-    KQ.push_back(l);
-    // Tìm các trạng thái đã suy ra được trạng thái đích
-    while (FATHER[l] != 0) {
-        KQ.push_back(FATHER[l]);
-        l = FATHER[l];
-    }
-    cout << "KQ: " << KQ.size() << endl;
-    index = KQ.size();
-    FrameLoadingImage.render(292, 119);
-    LoadingImageRect = { 0, 9 * 140, 454, 132 };
-    LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
-    SDL_RenderPresent(gRenderer);
-    SDL_Delay(500);
+        // Đẩy trạng thái đích vào KQ
+        KQ.push_back(l);
+        // Tìm các trạng thái đã suy ra được trạng thái đích
+        while (FATHER[l] != 0) {
+            KQ.push_back(FATHER[l]);
+            l = FATHER[l];
+        }
+        cout << "KQ: " << KQ.size() << endl;
+        index = KQ.size();
+        FrameLoadingImage.render(292, 119);
+        LoadingImageRect = { 0, 9 * 140, 454, 132 };
+        LoadingImage.render((SCREEN_WIDTH - 454) / 2, (SCREEN_HEIGHT - 132) / 2, &LoadingImageRect);
+        SDL_RenderPresent(gRenderer);
+        SDL_Delay(500);
 }
 
 void Gameplay::Clear()
@@ -740,6 +764,24 @@ void Gameplay::SetUpGame(int height)
     CutPicture.clear();
 }
 
+void Gameplay::PressReload()
+{
+    if (Mode == 1) Random(Height);
+    else SetNguoc(Height);
+    KQ.clear();
+    CLOSE.clear();
+    while (!OPEN.empty()) {
+        OPEN.pop();
+    }
+    res = 1;
+    checkmove = true;
+    step = 0;
+    if (timer.isStarted())
+        timer.stop();
+    isPressReload = false;
+    WinnerScreenOff = false;
+}
+
 void Gameplay::handleEvents() {
     //Hàm xử lí sự kiện để chơi trò chơi
     bool isQuit = false;
@@ -760,6 +802,7 @@ void Gameplay::handleEvents() {
             switch (event.key.keysym.sym)
             {
             case SDLK_UP:
+            case SDLK_w:
             {
                 // nếu phím được nhấn là phím Up thì ta xét vị trí dưới ô trống, nếu vị trí đó hợp lí thì hoán đổi 2 ô
                 int x = a[pa.first + 1][pa.second];
@@ -783,6 +826,7 @@ void Gameplay::handleEvents() {
                 break;
             }
             case SDLK_DOWN:
+            case SDLK_s:
             {
                 int x = a[pa.first - 1][pa.second];
                 if (x != n * n) {
@@ -805,6 +849,7 @@ void Gameplay::handleEvents() {
                 break;
             }
             case SDLK_LEFT:
+            case SDLK_a:
             {
                 int x = a[pa.first][pa.second + 1];
                 if (x != n * n) {
@@ -827,6 +872,7 @@ void Gameplay::handleEvents() {
                 break;
             }
             case SDLK_RIGHT:
+            case SDLK_d:
             {
                 int x = a[pa.first][pa.second - 1];
                 if (x != n * n) {
@@ -872,20 +918,9 @@ void Gameplay::handleEvents() {
             break;
         }
         //Button Reload
-        else if(x >= 987 && x <= 1809 && y >= 371 && y <= 447 && checksolve == 0)
+        else if(((x >= 987 && x <= 1809 && y >= 371 && y <= 447 ) || isPressReload) && checksolve == 0)
         {
-            if (Mode == 1) Random(Height);
-            else SetNguoc(Height);
-            KQ.clear();
-            CLOSE.clear();
-            while (!OPEN.empty()) {
-                OPEN.pop();
-            }
-            res = 1;
-            checkmove = true;
-            step = 0;
-            if (timer.isStarted())
-                timer.stop();
+            PressReload();
             break;
         }
         //Button Back
@@ -947,7 +982,12 @@ void Gameplay::SolveGame()
         res = 1;
         bool CheckQuit = false;
         AuToRun(CheckQuit);
-        if (CheckQuit) return;
+        if (CheckQuit)
+        {
+            cout << "Da thoat\n";
+            return;
+        }
+        else cout << "Sai r\n";
 
     }
     checkmove = false;
@@ -963,6 +1003,10 @@ void Gameplay::SolveGame()
             if (e.type == SDL_QUIT)
             {
                 isQuit = true;
+                outGame = true;
+            }
+            else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+            {
                 outGame = true;
             }
             else if (e.type == SDL_MOUSEBUTTONDOWN)
@@ -1022,8 +1066,6 @@ void Gameplay::SolveGame()
 
 }
 
-
-
 void Gameplay::update() {
     // Hàm cập nhật lại các tọa độ của các đối tượng của game ( các mảnh puzzle )
     for (int i = 0; i <= n * n - 1; i++)
@@ -1064,12 +1106,28 @@ void Gameplay::render() {
     {
         Number[i]->Render();
     }
+
     if (CheckGoal(a))
     {
         Number[0]->Render();
-        Winner W(step, time);
-        W.run();
+        SDL_RenderPresent(gRenderer);
+        if (!WinnerScreenOff)
+        {
+            Winner W(step, time);
+            W.run();
+            isPressBack = W.GetIsPressBack();
+            isPressReload = W.GetIsPressReload();
+            cout << isPressReload;
+            if (isPressReload)
+            {
+                PressReload();
+                isPressReload = false;
+            }
+            else WinnerScreenOff = true;
+        }
     }
+    if (isPressReload)
+        render();
     SDL_RenderPresent(gRenderer);
 }
 

@@ -3,6 +3,7 @@
 
 MainMenu::MainMenu() {
     mQuit = false;
+    CanGetName = true;
 }
 
 MainMenu::~MainMenu() {
@@ -54,34 +55,31 @@ bool MainMenu::init() {
 bool MainMenu::loadMedia() {
     bool success = true;
 
-    if (!MTexture.loadFromFile("IMG/Begin.PNG")) {
+    if (!MTexture.loadFromFile("Data//Main Menu//Main Menu.png")) {
         success = false;
     }
-    else if (!Start.loadFromFile("IMG/Start.PNG")) {
+    else if (!Start.loadFromFile("Data//Main Menu//Start.png")) {
         success = false;
     }
-    else if (!BHelp.loadFromFile("IMG/Help.PNG")) {
+    else if (!BHelp.loadFromFile("Data//Main Menu//Help.png")) {
         success = false;
     }
-    else if (!Exit.loadFromFile("IMG/Exit.PNG")) {
+    else if (!BLeaderBoard.loadFromFile("Data//Main Menu//LeaderBoard.png")) {
         success = false;
     }
     else {
         MTexture.Resize(SCREEN_WIDTH, SCREEN_HEIGHT);
         for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
-            gSpriteClips[i].x = 1;
-            gSpriteClips[i].y = 93 * i + 6;
-            gSpriteClips[i].w = BUTTON_WIDTH;
-            gSpriteClips[i].h = BUTTON_HEIGHT;
+            gSpriteClips[i].x = 0;
+            gSpriteClips[i].y = 116 * i;
+            gSpriteClips[i].w = ButtonWidth;
+            gSpriteClips[i].h = ButtonHeight;
         }
 
-        mPlayButton = { (SCREEN_WIDTH - BUTTON_WIDTH) / 2, 3 * SCREEN_HEIGHT / 5 , BUTTON_WIDTH, BUTTON_HEIGHT};
-        mInstructionsButton = { (SCREEN_WIDTH - BUTTON_WIDTH) / 2, 3 * SCREEN_HEIGHT / 5 + 92 , BUTTON_WIDTH, BUTTON_HEIGHT };
-        mExitButton = { (SCREEN_WIDTH - BUTTON_WIDTH) / 2, 3 * SCREEN_HEIGHT / 5 + 2 * 92, BUTTON_WIDTH, BUTTON_HEIGHT };
-
-        gButtons[BUTTON_PLAY].SetAllValue(mPlayButton.x, mPlayButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        gButtons[BUTTON_INSTRUCTIONS].SetAllValue(mInstructionsButton.x, mInstructionsButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
-        gButtons[BUTTON_EXIT].SetAllValue(mExitButton.x, mExitButton.y, BUTTON_WIDTH, BUTTON_HEIGHT);
+        for (int i = 0; i < TOTAL_BUTTONS; ++i)
+        {
+            gButtons[i].SetAllValue(_X, _Y + i * (ButtonHeight + Distance), ButtonWidth, ButtonHeight);
+        }
     }
 
     return success;
@@ -92,7 +90,7 @@ void MainMenu::close() {
     MTexture.free();
     Start.free();
     BHelp.free();
-    Exit.free();
+    BLeaderBoard.free();
 }
 
 void MainMenu::run() {
@@ -120,21 +118,26 @@ void MainMenu::run() {
                 gButtons[i].HandleEvent(&e);
                 // Xác định nút nào được nhấn và thực hiện tác vụ tương ứng
                 if (isBackButtonClick || e.type == SDL_MOUSEBUTTONDOWN && gButtons[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN) {
-                    if (isBackButtonClick && !outGame) i = BUTTON_PLAY;
+                    if (isBackButtonClick && !outGame) i = BUTTON_START;
                     switch (i) {
-                    case BUTTON_PLAY:
+                    case BUTTON_START:
                     {
                         GetPlayerName GetPlayerName;
-                        if (!GetPlayerName.run())
+                        if (CanGetName)
                         {
-                            cout << "Player Name is Empty " << endl;
-                            break;
+                            if (!GetPlayerName.run())
+                            {
+                                cout << "Player Name is Empty " << endl;
+                                break;
+                            }
+                            else  CanGetName = false;
                         }
                         isBackButtonClick = false;
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
                         MenuStart startgame;
                         do {
                             startgame.run();
+                            CanGetName = startgame.getIsOut();
                         } while (!startgame.getIsChooseMode() && !outGame && !startgame.getIsOut());
                         if (!outGame && !startgame.getIsOut())
                         {
@@ -153,7 +156,7 @@ void MainMenu::run() {
                         }
                         break;
                     }
-                    case BUTTON_INSTRUCTIONS:
+                    case BUTTON_HELP:
                         // Thực hiện hành động khi nút INSTRUCTIONS_BUTTON được nhấn
                         //Chuyển đến màn hình hướng dẫn
                         if (!outGame)
@@ -169,24 +172,30 @@ void MainMenu::run() {
                             }
                         }
                         break;
-                    case BUTTON_EXIT:
+                    case BUTTON_LEADERBOARD:
                         // Thực hiện hành động khi nút EXIT_BUTTON được nhấn
-                        mQuit = true; // Kết thúc game
-                        outGame = true;
-                        break;
+                        LeaderBoard HighScore;
+                        HighScore.run();
                     }
+                }
+                else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    mQuit = true;
+                    outGame = true;
                 }
             }
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
+        // Đợi một khoảng thời gian ngắn trước khi cập nhật màn hình
+        SDL_Delay(10);
+
         if (!outGame)
         {
-
             MTexture.render(0, 0);
-            gButtons[BUTTON_PLAY].render(Start, gSpriteClips);
-            gButtons[BUTTON_INSTRUCTIONS].render(BHelp, gSpriteClips);
-            gButtons[BUTTON_EXIT].render(Exit, gSpriteClips);
+            gButtons[BUTTON_START].render(Start, gSpriteClips);
+            gButtons[BUTTON_HELP].render(BHelp, gSpriteClips);
+            gButtons[BUTTON_LEADERBOARD].render(BLeaderBoard, gSpriteClips);
             SDL_RenderPresent(gRenderer);
         }
     }
