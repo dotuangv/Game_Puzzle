@@ -6,6 +6,7 @@ MainMenu::MainMenu() {
     CanGetName = true;
 }
 
+
 MainMenu::~MainMenu() {
     //close();
 }
@@ -22,7 +23,7 @@ bool MainMenu::init() {
             success = false;
         }
         else {
-            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
             if (gRenderer == NULL) {
                 success = false;
             }
@@ -134,15 +135,15 @@ void MainMenu::run() {
                         }
                         isBackButtonClick = false;
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
-                        MenuStart startgame;
-                        do {
+                        MenuStart startgame(GetPlayerName.getInputText());
+                        do { 
                             startgame.run();
                             CanGetName = startgame.getIsOut();
                         } while (!startgame.getIsChooseMode() && !outGame && !startgame.getIsOut());
                         if (!outGame && !startgame.getIsOut())
                         {
                             Gameplay* game;
-                            game = new Gameplay();
+                            game = new Gameplay(GetPlayerName.getInputText());
                             game->Run();
                             if (!outGame) isBackButtonClick = true;
                         }
@@ -187,8 +188,6 @@ void MainMenu::run() {
         }
         SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
-        // Đợi một khoảng thời gian ngắn trước khi cập nhật màn hình
-        SDL_Delay(10);
 
         if (!outGame)
         {
