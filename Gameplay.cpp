@@ -608,7 +608,7 @@ void Gameplay::SolveMouse(pair<int, int> p)
 
 void Gameplay::Infile()
 {
-    string tenfile = "ContinueGame/puzzle";
+    string tenfile = "ContinueGame//puzzle";
     string N = to_string(n);
     tenfile += N + ".txt";
     ifstream inFile(tenfile);
@@ -630,6 +630,23 @@ void Gameplay::Infile()
         inFile >> Poszero.first >> Poszero.second;
 
         inFile.close();
+    }
+}
+
+bool Gameplay::AddScoretoFile()
+{
+    const string filename = "LeaderBoard-Record//HighScore" + to_string(n) + ".txt";
+    std::ofstream file(filename, std::ios::app);
+
+    if (file.is_open()) {
+        file << PlayerName << "," << timeplay << "," << step << std::endl;
+        file.close();
+        std::cout << "Data has been saved to file " << filename << std::endl;
+        return true;
+    }
+    else {
+        std::cerr << "Unable to open file to save data." << std::endl;
+        return false;
     }
 }
 
@@ -1097,8 +1114,8 @@ void Gameplay::render() {
     StepTexture.loadFromRenderedText(to_string(step), { 0xFF, 0xFF, 0xFF }, 20);
     StepTexture.render(660, 28);
     
-    string time = millisecondsToTimeString(timer.getTicks());
-    timing.loadFromRenderedText(time, { 0xFF, 0xFF, 0xFF }, 20);
+    timeplay = millisecondsToTimeString(timer.getTicks());
+    timing.loadFromRenderedText(timeplay, { 0xFF, 0xFF, 0xFF }, 20);
     timing.render(92, 28);
     ButtonMode.render(282, 6, &ButtonModeRect[n - 3]);
 
@@ -1109,11 +1126,19 @@ void Gameplay::render() {
 
     if (CheckGoal(a))
     {
+        //if (!AddScoretoFile())
+        //{
+        //    cout << "Can't add to file \n";
+        //}
         Number[0]->Render();
         SDL_RenderPresent(gRenderer);
         if (!WinnerScreenOff)
         {
-            Winner W(step, time);
+            if (!AddScoretoFile())
+            {
+                cout << "Khong the luu diem vo file" << endl;
+            }
+            Winner W(step, timeplay);
             W.run();
             isPressBack = W.GetIsPressBack();
             isPressReload = W.GetIsPressReload();

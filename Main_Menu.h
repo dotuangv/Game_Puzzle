@@ -66,6 +66,9 @@ private:
         TOTAL_BUTTONS
     };
 
+    //Tên Người chơi
+    string PlayerName;
+
     SDL_Rect gSpriteClips[BUTTON_SPRITE_TOTAL];
 
     void renderText(const std::string& text, int x, int y);

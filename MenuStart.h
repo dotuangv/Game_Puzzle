@@ -14,7 +14,8 @@ private:
     bool isRunning;
     bool isChooseMode;
     bool isOut;
-    
+    string PlayerName;
+
     enum StartButton
     {
         BUTTON_MODE_3 = 0,
@@ -34,6 +35,7 @@ private:
 
 public:
     MenuStart();
+    MenuStart(string PlayerName);
     ~MenuStart();
     bool init();
     bool loadMedia();

@@ -9,6 +9,13 @@ MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)), 
     isOut = false;
 }
 
+MenuStart::MenuStart(string PlayerName) : isRunning(true), MenuStartButton(vector<LTexture>(6)), LargeImage(nullptr), MenuImage(vector<LTexture>(TOTAL_IMAGE))
+{  
+    isChooseMode = false;
+    isOut = false;
+    this->PlayerName = PlayerName;
+}
+
 MenuStart::~MenuStart() {
     close();
 }

@@ -9,10 +9,14 @@ using namespace std;
 
 class Gameplay {
 private:
+    //Đích 
     vector<vector<int>> Goal;
+    //Mảng Chỉ số Puzzle
     vector<vector<int>> a;
     vector<int> b;
+    //Tọa độ Ảnh
     vector<pair<int, int>> posIMG;
+    //Hàng đợi ưu tiên xử lí Autorun
     priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> OPEN;
     vector<pair<vector<vector<int>>, int>> FRINGE;
     vector<vector<vector<int>>> CLOSE;
@@ -26,6 +30,10 @@ private:
     pair<int, int> Poszero;
     bool checkmove = true;
     int farfromgoal = 0;
+    //Tên người chơi
+    string PlayerName;
+    //Thoi gian
+    string timeplay;
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
@@ -34,6 +42,21 @@ public:
         posIMG(vector<pair<int, int>>(6 * 6 + 1)),
         FRINGE(100000, pair<vector<vector<int>>,
         int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)),
+        FATHER(vector<int>(100000))
+        {
+            cnt = 0;
+            check = 0;
+            checksolve = 0;
+            res = 1;
+            step = 0;
+            isRunning = true;
+        }
+    Gameplay(string PlayerName) : PlayerName(PlayerName), Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
+        a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
+        b(vector<int>(6 + 2)),
+        posIMG(vector<pair<int, int>>(6 * 6 + 1)),
+        FRINGE(100000, pair<vector<vector<int>>,
+            int>(vector<vector<int>>(6 + 2, vector<int>(6 + 2)), 0)),
         FATHER(vector<int>(100000))
         {
             cnt = 0;
@@ -83,4 +106,5 @@ public:
     void SolveMouse(pair<int, int> p);
     void Infile();
     void Outfile();
+    bool AddScoretoFile();
 };
