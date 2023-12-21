@@ -1,5 +1,6 @@
 ﻿#include "Main_Menu.h"
-#include "GetPlayerName.h"
+
+bool Continue = false;
 
 MainMenu::MainMenu() {
     mQuit = false;
@@ -95,7 +96,8 @@ void MainMenu::close() {
 }
 
 void MainMenu::run() {
-    if (outGame) return;
+    if (outGame) 
+        return;
     if (!isInit)
     {
         if (!init()) {
@@ -131,19 +133,24 @@ void MainMenu::run() {
                                 cout << "Player Name is Empty " << endl;
                                 break;
                             }
-                            else  CanGetName = false;
+                            else
+                            {
+                                CanGetName = false;
+                                PlayerName = GetPlayerName.getInputText();
+                            }
                         }
                         isBackButtonClick = false;
                         // Thực hiện hành động khi nút PLAY_BUTTON được nhấn
-                        MenuStart startgame(GetPlayerName.getInputText());
+                        MenuStart startgame(PlayerName);
                         do { 
                             startgame.run();
+                            Continue = startgame.getUnfinished();
                             CanGetName = startgame.getIsOut();
-                        } while (!startgame.getIsChooseMode() && !outGame && !startgame.getIsOut());
+                        } while (!startgame.getIsChooseMode() && !outGame && !startgame.getIsOut() && !Continue);
                         if (!outGame && !startgame.getIsOut())
                         {
                             Gameplay* game;
-                            game = new Gameplay(GetPlayerName.getInputText());
+                            game = new Gameplay(PlayerName, startgame.getUnfinished());
                             game->Run();
                             if (!outGame) isBackButtonClick = true;
                         }

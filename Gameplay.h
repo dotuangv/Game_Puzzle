@@ -34,6 +34,9 @@ private:
     string PlayerName;
     //Thoi gian
     string timeplay;
+    //Đã từng nhấn AutoRun
+    bool UsedtoPressAutoRun = false;
+    bool ContinueGame = false;
 public:
     // Constructor
     Gameplay() : Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
@@ -51,7 +54,8 @@ public:
             step = 0;
             isRunning = true;
         }
-    Gameplay(string PlayerName) : PlayerName(PlayerName), Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
+    //Flag kiểm tra xem có tiếp tục game hay tạo mới
+    Gameplay(string PlayerName, bool flag = false) : PlayerName(PlayerName), ContinueGame(flag),  Goal(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
         a(vector<vector<int>>(6 + 2, vector<int>(6 + 2))),
         b(vector<int>(6 + 2)),
         posIMG(vector<pair<int, int>>(6 * 6 + 1)),
