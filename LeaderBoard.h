@@ -27,24 +27,46 @@ private:
 	vector<vector<Record>> LeaderBoardRecord;
 	LTexture LBTexture;
 	SDL_Renderer* LBRenderer;
+	//Mốc rank hiện tại
 	int Current;
+	//Chế độ hiện tại
+	int CurrentMode;
 	int MAX = 10;
+
+	const int ButtonWidth = 134;
+	const int ButtonHeight = 71;
+	const int y = 81;
+
 	vector<std::vector<LTexture>> StepTexture;
 	vector<std::vector<LTexture>> NameTexture;
 	vector<std::vector<LTexture>> TimeTexture;
 	vector<std::vector<LTexture>> RankTexture;
+	SDL_Rect *SpriteRect;
+	vector<LTexture> ModeDisplay;
+	vector<LButton> ModeDisplayButton;
+
 	bool Quit;
 	SDL_Event e;
 public:
-	LeaderBoard() {
+	LeaderBoard() : SpriteRect(new SDL_Rect[3]) {
 		Current = 0;
 		Quit = false;
-
+		SpriteRect[0] = { 0, 0, 154, 71 };
+		SpriteRect[1] = { 0, 99, 154, 71 };
+		SpriteRect[2] = { 0, 198, 154, 71 };
 		// Initialize vectors with proper size
 		StepTexture.resize(ModeTotal, std::vector<LTexture>(10));
 		NameTexture.resize(ModeTotal, std::vector<LTexture>(10));
 		TimeTexture.resize(ModeTotal, std::vector<LTexture>(10));
 		RankTexture.resize(ModeTotal, std::vector<LTexture>(10));
+		ModeDisplay.resize(ModeTotal);
+		ModeDisplayButton.resize(ModeTotal);
+		LeaderBoardRecord.resize(ModeTotal);
+
+		ModeDisplayButton[0].SetAllValue(142, 81, ButtonWidth, ButtonHeight);
+		ModeDisplayButton[1].SetAllValue(323, 81, ButtonWidth, ButtonHeight);
+		ModeDisplayButton[2].SetAllValue(817, 81, ButtonWidth, ButtonHeight);
+		ModeDisplayButton[3].SetAllValue(997, 81, ButtonWidth, ButtonHeight);
 
 		// ... rest of your constructor code ...
 	}
@@ -128,7 +150,12 @@ public:
 			success = false;
 		}
 
-		const string filename = "LeaderBoard-Record//HighScore.txt";
+		for (int i = 0; i < ModeTotal; ++i)
+		{
+			ModeDisplay[i].loadFromFile("IMG//LeaderBoard//Mode" + to_string(i) + ".png", false);
+		}
+
+		const string filename = "LeaderBoard-Record//HighScore" + to_string(mode + 3) + ".txt";
 
 		std::ifstream file(filename);
 		LeaderBoardRecord[static_cast<int>(mode)].clear(); // Clear old data from the vector before reading from the file
@@ -165,13 +192,13 @@ public:
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			for (int j = 0; j < 10; ++j)
+			for (int j = 0; j < LeaderBoardRecord[i].size(); ++j)
 			{
 				string tmp = to_string(j + 1);
-				RankTexture[i][j].loadFromRenderedText(tmp, { 0xFF, 0xFF, 0xFF, 0xFF }, 48);
-				StepTexture[i][j].loadFromRenderedText(to_string(LeaderBoardRecord[i][j].step), { 0xFF, 0xFF, 0xFF, 0xFF }, 48);
-				NameTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].name, { 0xFF, 0xFF, 0xFF, 0xFF }, 48);
-				TimeTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].time, { 0xFF, 0xFF, 0xFF, 0xFF }, 48);
+				RankTexture[i][j].loadFromRenderedText(tmp, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
+				StepTexture[i][j].loadFromRenderedText(to_string(LeaderBoardRecord[i][j].step), { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
+				NameTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].name, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
+				TimeTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].time, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
 			}
 		}
 	}
@@ -179,6 +206,11 @@ public:
 	void render(ModeLeaderBoard mode)
 	{
 		LBTexture.render(0, 0);
+		for (int i = 0; i < ModeTotal; ++i)
+		{
+			ModeDisplayButton[i].render(ModeDisplay[i], SpriteRect);
+		}
+
 		for (int i = 0; i < 5; ++i)
 		{
 			RankTexture[mode][Current + i].render(186, 272 + 78 * i);
@@ -210,17 +242,22 @@ public:
 				if (Current - 1 >= 0)
 					--Current;
 			}
+			for (int i = 0; i < 4; ++i)
+			{
+				ModeDisplayButton[i].HandleEvent(&e);
+			}
 		}
 	}
 
 	void run()
 	{
-		Test();
-		SaveToFile(Mode3x3);
-		if (!LoadFromFile(Mode3x3))
+		for (int i = Mode3x3; i < ModeTotal; ++i)
 		{
-			cout << "LeaderBoard can't load some file " << endl;
-			return;
+			if (!LoadFromFile(ModeLeaderBoard(i)))
+			{
+				cout << "LeaderBoard can't load some file " << endl;
+				return;
+			}
 		}
 		LoadAllData();
 		DisplayScore();
@@ -228,7 +265,7 @@ public:
 		{
 			LBTexture.render(0, 0);
 			HandleEvent();
-			render(Mode3x3);
+			render(ModeLeaderBoard(CurrentMode));
 			SDL_RenderPresent(gRenderer);
 		}
 	}
