@@ -52,6 +52,7 @@ private:
 	LButton Back;
 	bool Quit;
 	SDL_Event e;
+	SDL_Color TextColor = { 0, 0, 0, 0xFF };
 public:
 	LeaderBoard() : SpriteRect(new SDL_Rect[3]) {
 		Current = 0;
@@ -190,10 +191,10 @@ public:
 			for (int j = 0; j < LeaderBoardRecord[i].size(); ++j)
 			{
 				std::string tmp = to_string(j + 1);
-				RankTexture[i][j].loadFromRenderedText(tmp, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
-				StepTexture[i][j].loadFromRenderedText(to_string(LeaderBoardRecord[i][j].step), { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
-				NameTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].name, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
-				TimeTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].time, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
+				RankTexture[i][j].loadFromRenderedText(tmp, TextColor, 36);
+				StepTexture[i][j].loadFromRenderedText(to_string(LeaderBoardRecord[i][j].step), TextColor, 36);
+				NameTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].name, TextColor, 36);
+				TimeTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].time, TextColor, 36);
 			}
 		}
 	}

@@ -233,7 +233,7 @@ void MenuStart::run() {
             SDL_RenderClear(gRenderer);*/
             TmpImages[Order % TOTAL_IMAGE].Resize(208, 208);
             HTexture.render(0, 0);
-            PlayerNameTexture.render(256 - PlayerNameTexture.getWidth() / 2, 253);
+            PlayerNameTexture.render(286 - PlayerNameTexture.getWidth() / 2, 253);
             for (int i = 0; i < START_BUTTON_TOTAL; ++i)
             {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
