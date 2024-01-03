@@ -47,3 +47,12 @@ int main(int argc, char* argv[])
 //	return 0;
 //}
 
+//int main(int argc, char* argv[])
+//{
+//	MainMenu b;
+//	b.init();
+//	LeaderBoard a;
+//	a.run();
+//	return 0;
+//}
+
