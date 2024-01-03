@@ -15,6 +15,7 @@ private:
     bool isChooseMode;
     bool isOut;
     string PlayerName;
+    bool Unfinished = false;
 
     enum StartButton
     {
@@ -31,6 +32,7 @@ private:
     SDL_Rect gRect[START_BUTTON_TOTAL];
     LButton gButton[START_BUTTON_TOTAL];
     SDL_Texture* LargeImage;
+    LTexture PlayerNameTexture;
     std::vector<LTexture> MenuImage;
 
 public:
@@ -40,10 +42,14 @@ public:
     bool init();
     bool loadMedia();
     void close();
+    bool CheckNonFinishGame(int n);
     void run();
+    void HandleEvent2();
+    void HandleEvent1();
     void HandleEvent();
     bool getIsChooseMode() { return isChooseMode; }
     bool getIsOut(){ return isOut;  }
+    bool getUnfinished() { return Unfinished; }
 };
 
 

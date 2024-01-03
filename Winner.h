@@ -10,21 +10,22 @@ class Winner {
 	LTexture TimeTexture;
 	LTexture StepTexture;
 	int step;
+	int rank;
 	string time;
-	SDL_Rect RankRect[10];
+	SDL_Rect RankRect[11];
 	bool Quit;
 	SDL_Event e;
 	bool isPressBack;
 	bool isPressReload;
 public:
-	Winner(int step, string time) : step(step), time(time) 
+	Winner(int step, string time, int rank) : step(step), time(time), rank(rank)
 	{
 		Quit = false;
 		isPressBack = false;
 		isPressReload = false;
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < 11; ++i)
 		{
-			RankRect[i] = { 0, 72 * i, 184, 72 };
+			RankRect[i] = { 0, 70 * i, 184, 72 };
 		}
 	}
 	
@@ -109,7 +110,7 @@ public:
 	void render()
 	{
 		WTexture.render(399, 79);
-		RankTexture.render(553, 425, &RankRect[0]);
+		RankTexture.render(553, 425, &RankRect[rank]);
 		TimeTexture.render((SCREEN_WIDTH - TimeTexture.getWidth()) / 2, 260);
 		StepTexture.render((SCREEN_WIDTH - StepTexture.getWidth()) / 2, 358);
 		SDL_RenderPresent(gRenderer);

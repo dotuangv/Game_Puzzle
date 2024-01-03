@@ -1,12 +1,17 @@
 ﻿#pragma once
+#ifndef LEADER_BOARD_H_
+#define LEADER_BOARD_H_
+
 #include "CommonFunc.h"
 
+using namespace std;
+
 struct Record {
-	string name;
-	string time;
+	std::string name;
+	std::string time;
 	int step;
 	Record() {}
-	Record(string name_i, string time_i, int step_i)
+	Record(std::string name_i, std::string time_i, int step_i)
 	{
 		name = name_i;
 		time = time_i;
@@ -24,27 +29,27 @@ enum ModeLeaderBoard {
 
 class LeaderBoard {
 private:
-	vector<vector<Record>> LeaderBoardRecord;
+	std::vector<std::vector<Record>> LeaderBoardRecord;
 	LTexture LBTexture;
 	SDL_Renderer* LBRenderer;
 	//Mốc rank hiện tại
 	int Current;
 	//Chế độ hiện tại
 	int CurrentMode;
-	int MAX = 10;
+	int MAX = 20;
 
 	const int ButtonWidth = 134;
 	const int ButtonHeight = 71;
 	const int y = 81;
 
-	vector<std::vector<LTexture>> StepTexture;
-	vector<std::vector<LTexture>> NameTexture;
-	vector<std::vector<LTexture>> TimeTexture;
-	vector<std::vector<LTexture>> RankTexture;
+	std::vector<std::vector<LTexture>> StepTexture;
+	std::vector<std::vector<LTexture>> NameTexture;
+	std::vector<std::vector<LTexture>> TimeTexture;
+	std::vector<std::vector<LTexture>> RankTexture;
 	SDL_Rect *SpriteRect;
-	vector<LTexture> ModeDisplay;
-	vector<LButton> ModeDisplayButton;
-
+	std::vector<LTexture> ModeDisplay;
+	std::vector<LButton> ModeDisplayButton;
+	LButton Back;
 	bool Quit;
 	SDL_Event e;
 public:
@@ -55,14 +60,14 @@ public:
 		SpriteRect[1] = { 0, 99, 154, 71 };
 		SpriteRect[2] = { 0, 198, 154, 71 };
 		// Initialize vectors with proper size
-		StepTexture.resize(ModeTotal, std::vector<LTexture>(10));
-		NameTexture.resize(ModeTotal, std::vector<LTexture>(10));
-		TimeTexture.resize(ModeTotal, std::vector<LTexture>(10));
-		RankTexture.resize(ModeTotal, std::vector<LTexture>(10));
+		StepTexture.resize(ModeTotal, std::vector<LTexture>(MAX));
+		NameTexture.resize(ModeTotal, std::vector<LTexture>(MAX));
+		TimeTexture.resize(ModeTotal, std::vector<LTexture>(MAX));
+		RankTexture.resize(ModeTotal, std::vector<LTexture>(MAX));
 		ModeDisplay.resize(ModeTotal);
 		ModeDisplayButton.resize(ModeTotal);
 		LeaderBoardRecord.resize(ModeTotal);
-
+		Back.SetAllValue(1159, 8, 101, 101);
 		ModeDisplayButton[0].SetAllValue(142, 81, ButtonWidth, ButtonHeight);
 		ModeDisplayButton[1].SetAllValue(323, 81, ButtonWidth, ButtonHeight);
 		ModeDisplayButton[2].SetAllValue(817, 81, ButtonWidth, ButtonHeight);
@@ -73,19 +78,6 @@ public:
 	~LeaderBoard() {
 		LeaderBoardRecord.clear();
 		LBTexture.free();
-	}
-
-	void Test()
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			vector<Record> tmp;
-			for (int j = 0; j < 10; ++j)
-			{
-				tmp.emplace_back("Linh", "00 00", i + j);
-			}
-			LeaderBoardRecord.push_back(tmp);
-		}
 	}
 
 	void RemoveAllScore()
@@ -104,6 +96,7 @@ public:
 		}
 	}
 
+	//Trả về true nếu R1 xếp hạng cao hơn R2 (Thời gian bé hơn (hoặc số bước bé hơn nếu thời gian bằng)
 	static bool Compare(Record R1, Record R2)
 	{
 		int check = strcmp(R1.time.c_str(), R2.time.c_str());
@@ -155,7 +148,7 @@ public:
 			ModeDisplay[i].loadFromFile("IMG//LeaderBoard//Mode" + to_string(i) + ".png", false);
 		}
 
-		const string filename = "LeaderBoard-Record//HighScore" + to_string(mode + 3) + ".txt";
+		const std::string filename = "LeaderBoard-Record//HighScore" + to_string(mode + 3) + ".txt";
 
 		std::ifstream file(filename);
 		LeaderBoardRecord[static_cast<int>(mode)].clear(); // Clear old data from the vector before reading from the file
@@ -179,6 +172,8 @@ public:
 				cout << LeaderBoardRecord[static_cast<int>(mode)][i].name << " "
 					<< LeaderBoardRecord[static_cast<int>(mode)][i].time << " "
 					<< LeaderBoardRecord[static_cast<int>(mode)][i].step << endl;
+				sort(LeaderBoardRecord[static_cast<int>(mode)].begin(),
+					LeaderBoardRecord[static_cast<int>(mode)].end(), Compare);
 			}
 		}
 		else {
@@ -194,7 +189,7 @@ public:
 		{
 			for (int j = 0; j < LeaderBoardRecord[i].size(); ++j)
 			{
-				string tmp = to_string(j + 1);
+				std::string tmp = to_string(j + 1);
 				RankTexture[i][j].loadFromRenderedText(tmp, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
 				StepTexture[i][j].loadFromRenderedText(to_string(LeaderBoardRecord[i][j].step), { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
 				NameTexture[i][j].loadFromRenderedText(LeaderBoardRecord[i][j].name, { 0xFF, 0xFF, 0xFF, 0xFF }, 36);
@@ -210,7 +205,7 @@ public:
 		{
 			ModeDisplayButton[i].render(ModeDisplay[i], SpriteRect);
 		}
-
+		ModeDisplayButton[CurrentMode].render(ModeDisplay[CurrentMode], SpriteRect, true);
 		for (int i = 0; i < 5; ++i)
 		{
 			RankTexture[mode][Current + i].render(186, 272 + 78 * i);
@@ -226,6 +221,7 @@ public:
 			if (e.type == SDL_QUIT)
 			{
 				Quit = true;
+				outGame = true;
 			}
 			else if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)
 			{
@@ -242,11 +238,40 @@ public:
 				if (Current - 1 >= 0)
 					--Current;
 			}
-			for (int i = 0; i < 4; ++i)
+			if (e.type == SDL_MOUSEBUTTONDOWN)
 			{
-				ModeDisplayButton[i].HandleEvent(&e);
+				Back.HandleEvent(&e);
+				if (Back.getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN)
+				{
+					Quit = true;
+				}
+				for (int i = 0; i < 4; ++i)
+				{
+					ModeDisplayButton[i].HandleEvent(&e);
+					if (ModeDisplayButton[i].getCurrentSprite() == BUTTON_SPRITE_MOUSE_DOWN)
+					{
+						CurrentMode = i;
+					}
+				}
+
 			}
+			
 		}
+	}
+
+	int ReturnRank(int mode, Record R)
+	{
+		if (!LoadFromFile(ModeLeaderBoard(mode)))
+		{
+			cout << "LeaderBoard can't load some file " << endl;
+			return -1;
+		}
+		for (int i = 0; i < 10; ++i)
+		{
+			if (!Compare(LeaderBoardRecord[mode][i], R))
+				return i;
+		}
+		return 10; //unrank;
 	}
 
 	void run()
@@ -270,3 +295,5 @@ public:
 		}
 	}
 };
+
+#endif // LEADER_BOARD_H_

@@ -2,7 +2,9 @@
 #include "LButton.h"
 #include "Main_Menu.h"
 #include "Winner.h"
+#include "LeaderBoard.h"
 
+LeaderBoard LB;
 LTexture ButtonBack, ButtonReload, ButtonAutoRun, ButtonMode, StepTexture, SolveMode, LoadingImage, FrameLoadingImage;
 LButton gButtonBack, gButtonReload, gButtonAutoRun;
 
@@ -608,29 +610,42 @@ void Gameplay::SolveMouse(pair<int, int> p)
 
 void Gameplay::Infile()
 {
+    cout << "Infile run" << endl;
     string tenfile = "ContinueGame//puzzle";
     string N = to_string(n);
     tenfile += N + ".txt";
     ifstream inFile(tenfile);
-    if (inFile.is_open())
+    int status;
+    inFile >> status;
+    if (status)
     {
-        for (int i = 1; i <= n; i++)
+        if (inFile.is_open())
         {
-            for (int j = 1; j <= n; j++)
+            for (int i = 1; i <= n; i++)
             {
-                inFile >> a[i][j];
+                for (int j = 1; j <= n; j++)
+                {
+                    inFile >> a[i][j];
+                }
             }
+
+            for (int i = 0; i < n * n; i++)
+            {
+                inFile >> posIMG[i].first >> posIMG[i].second;
+            }
+
+            inFile >> Poszero.first >> Poszero.second;
+
+            inFile.close();
         }
-
-        for (int i = 0; i < n * n; i++)
-        {
-            inFile >> posIMG[i].first >> posIMG[i].second;
-        }
-
-        inFile >> Poszero.first >> Poszero.second;
-
-        inFile.close();
     }
+    display(a);
+    cout << endl;
+    for (int i = 0; i < n * n; i++)
+    {
+        cout << posIMG[i].first <<" " << posIMG[i].second << endl;
+    }
+    cout << Poszero.first << " " << Poszero.second;
 }
 
 bool Gameplay::AddScoretoFile()
@@ -655,26 +670,35 @@ void Gameplay::Outfile()
     string tenfile = "ContinueGame/puzzle";
     string N = to_string(n);
     tenfile += N + ".txt";
+    std::remove(tenfile.c_str()); // Xóa tệp cũ nếu tồn tại
     ofstream outFile(tenfile);
-    if (outFile.is_open())
+    if (CheckGoal(a))
     {
-        for (int i = 1; i <= n; i++)
+        outFile << 0 << endl;
+    }
+    else
+    {
+        outFile << 1 << endl;
+        if (outFile.is_open())
         {
-            for (int j = 1; j <= n; j++)
+            for (int i = 1; i <= n; i++)
             {
-                outFile << a[i][j] << " ";
+                for (int j = 1; j <= n; j++)
+                {
+                    outFile << a[i][j] << " ";
+                }
+                outFile << endl;
             }
-            outFile << endl;
+
+            for (int i = 0; i < n * n; i++)
+            {
+                outFile << posIMG[i].first << " " << posIMG[i].second << endl;
+            }
+
+            outFile << Poszero.first << " " << Poszero.second;
+
+            outFile.close();
         }
-
-        for (int i = 0; i < n * n; i++)
-        {
-            outFile << posIMG[i].first << " " << posIMG[i].second << endl;
-        }
-
-        outFile << Poszero.first << " " << Poszero.second;
-
-        outFile.close();
     }
 }
 
@@ -718,6 +742,7 @@ std::vector<SDL_Texture*> CutTextureIntoPieces(SDL_Texture* texture, int n) {
 
     return textures;
 }
+
 void Gameplay::SetNguoc(int height)
 {
     Height = height;
@@ -742,12 +767,17 @@ void Gameplay::SetNguoc(int height)
 void Gameplay::SetUpGame(int height)
 {
     setA();
-    if (Mode == 1)
+    if (ContinueGame)
+    {
+        Height = height;
+        Infile();
+        ContinueGame = false;
+        Mode = 1;
+    }
+    else if (Mode == 1)
         Random(height);
     else if (Mode == 2)
         SetNguoc(height);
-    //Height = height;
-    //Infile();
    /* cout << "Hello\n";
     cout << Poszero.first << " " << Poszero.second << endl;
     display(a);
@@ -797,6 +827,7 @@ void Gameplay::PressReload()
         timer.stop();
     isPressReload = false;
     WinnerScreenOff = false;
+    UsedtoPressAutoRun = false;
 }
 
 void Gameplay::handleEvents() {
@@ -920,8 +951,10 @@ void Gameplay::handleEvents() {
     {
             // Xử lí sự kiện bằng chuột, lấy tọa độ của vị trí chuột nhấn vào (x, y)
         int x = event.motion.x, y = event.motion.y;
+        //Auto Run
         if (x >= 870 && x <= 1223 && y >= 523 && y <= 590 && !CheckGoal(a))
         {
+            UsedtoPressAutoRun = true;
             if (!checksolve)
             {
                 checksolve = 1;
@@ -1132,13 +1165,14 @@ void Gameplay::render() {
         //}
         Number[0]->Render();
         SDL_RenderPresent(gRenderer);
-        if (!WinnerScreenOff)
+        if (!WinnerScreenOff && !UsedtoPressAutoRun)
         {
             if (!AddScoretoFile())
             {
                 cout << "Khong the luu diem vo file" << endl;
             }
-            Winner W(step, timeplay);
+            int rank = LB.ReturnRank(n - 3, { "Linh", timeplay, step });
+            Winner W(step, timeplay, 10);
             W.run();
             isPressBack = W.GetIsPressBack();
             isPressReload = W.GetIsPressReload();

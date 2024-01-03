@@ -3,6 +3,7 @@
 bool isBack = false;
 LTexture SButtonMode;
 SDL_Rect SButtonModeRect[] = { {0, 0, 186, 58}, {0, 70, 186, 58}, {0, 140, 186, 58}, {0, 210, 186, 58} };
+LTexture UnfinishedTexture;
 
 MenuStart::MenuStart() : isRunning(true), MenuStartButton(vector<LTexture>(6)), LargeImage(nullptr), MenuImage(vector<LTexture>(TOTAL_IMAGE)){
     isChooseMode = false;
@@ -69,17 +70,31 @@ bool MenuStart::loadMedia() {
         std::cout << "Can't not load Type Menu IMG: " << IMG_GetError() << std::endl;
         success = false;
     }
-    for (int i = 0; i < TOTAL_IMAGE; ++i)
+    else if (!PlayerNameTexture.loadFromRenderedText(PlayerName, { 0xFF, 0xFF, 0xFF, 0xFF }, 30))
     {
-        const std::string index = std::to_string(i);
-        if (!MenuImage[i].loadFromFile("Data/MenuImage/MenuImage" + index + ".png"))
-        {
-            std::cout << "Can't not load MenuImage img : \n" << IMG_GetError();
-            success = false;
-        }
-        else
-            TmpImages[i] = MenuImage[i];
+        std::cout << "Can't not load PlayerName Texture: " << IMG_GetError() << std::endl;
+        success = false;
     }
+    else if (!UnfinishedTexture.loadFromFile("IMG//Start_Menu//Unfinished Challenge.png", false))
+    {
+        std::cout << "Can't not load Unfinished Challenge Texture: " << IMG_GetError() << std::endl;
+        success = false;
+    }
+    else 
+    {
+        for (int i = 0; i < TOTAL_IMAGE; ++i)
+        {
+            const std::string index = std::to_string(i);
+            if (!MenuImage[i].loadFromFile("Data//MenuImage//MenuImage" + index + ".png"))
+            {
+                std::cout << "Can't not load MenuImage img : \n" << IMG_GetError();
+                success = false;
+            }
+            else
+                TmpImages[i] = MenuImage[i];
+        }
+    }
+    
     for (int i = 0; i < BUTTON_SPRITE_TOTAL; ++i) {
         gSpriteClips[i].x = 12;
         gSpriteClips[i].y = 10 + 144 * i;
@@ -113,6 +128,17 @@ void MenuStart::close() {
     // Đóng SDL_ttf và Mix
     //TTF_Quit();
     //Mix_Quit();
+}
+
+bool MenuStart::CheckNonFinishGame(int n)
+{
+    string tenfile = "ContinueGame//puzzle";
+    string N = to_string(n);
+    tenfile += N + ".txt";
+    ifstream inFile(tenfile);
+    bool status;
+    inFile >> status;
+    return status;
 }
 
 void MenuStart::run() {
@@ -154,7 +180,7 @@ void MenuStart::run() {
                         case BUTTON_MODE_3:
                         {
                             //Ô 3 x 3
-                            n = 3;                            
+                            n = 3;
                             isBack = false;
                             isRunning = false;
                             break;
@@ -207,6 +233,7 @@ void MenuStart::run() {
             SDL_RenderClear(gRenderer);*/
             TmpImages[Order % TOTAL_IMAGE].Resize(208, 208);
             HTexture.render(0, 0);
+            PlayerNameTexture.render(256 - PlayerNameTexture.getWidth() / 2, 253);
             for (int i = 0; i < START_BUTTON_TOTAL; ++i)
             {
                 gButton[i].render(MenuStartButton[i], gSpriteClips);
@@ -233,7 +260,44 @@ void MenuStart::run() {
     }
 }
 
-void MenuStart::HandleEvent()
+void MenuStart::HandleEvent2()
+{
+    UnfinishedTexture.render(0, 0);
+    SDL_RenderPresent(gRenderer);
+    bool isQuit = false;
+    SDL_Event e;
+    while (!isQuit)
+    {
+        while (SDL_PollEvent(&e))
+        {
+            if (e.type == SDL_QUIT)
+            {
+                isQuit = true;
+                outGame = true;
+            }
+            else if (e.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (e.motion.y >= 471 && e.motion.y <= 537)
+                {
+                    if (e.motion.x >= 397 && e.motion.x <= 600)
+                    {
+                        Unfinished = true;
+                        isQuit = true;
+                        isRunning = false;
+                        return;
+                    }
+                    else if (e.motion.x >= 688 && e.motion.x <= 888)
+                    {
+                        isQuit = true;
+                    }
+                }
+            }
+        }
+    }
+    HandleEvent1();
+}
+
+void MenuStart::HandleEvent1()
 {
     TypeMenu.render(0, 0);
     SButtonMode.render(515, 73, &SButtonModeRect[n - 3]);
@@ -289,5 +353,17 @@ void MenuStart::HandleEvent()
             }
         }
     }
-    
+}
+
+void MenuStart::HandleEvent()
+{
+    bool check = CheckNonFinishGame(n);
+    if (!check)
+    {
+        HandleEvent1();
+    }
+    else
+    {
+        HandleEvent2();
+    }
 }
